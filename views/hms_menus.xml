@@ -3,7 +3,6 @@
     <!-- Menu racine pour HMS -->
     <menuitem id="menu_hms_root"
               name="Hôpital"
-              web_icon="hms,static/description/icon.png"
               sequence="10"/>
 
     <!-- Sous-menus principaux -->
