@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Action pour les Médicaments (Produits filtrés) -->
+    <!-- Proposer 'produit stockable' par défaut -->
+    <record id="action_hms_medicine_product" model="ir.actions.act_window">
+        <field name="name">Medicines</field>
+        <field name="res_model">product.product</field>
+        <field name="view_mode">tree,form,kanban</field>
+        <field name="domain">[('is_medicine', '=', True), ('type', 'in', ['product', 'consu'])]</field>
+        <field name="context">{
+            'default_is_medicine': True,
+            'default_type': 'product',
+            'search_default_filter_to_sell': 0,
+            'search_default_filter_storable': 1
+        }</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No medicines found. Create new medicines here.
+            </p><p>
+                Ensure medicines are set as 'Storable Product' or 'Consumable' and marked as 'Is a Medicine'.
+                Stock levels are shown for 'Storable Products'.
+            </p>
+        </field>
+    </record>
+
+    <!-- Vue Tree pour les Médicaments (peut utiliser la vue standard ou être personnalisée) -->
+    <!-- Nous utilisons la vue par défaut de product.product, l'action ci-dessus la filtre déjà.
+         Si une vue spécifique est nécessaire, elle peut être définie ici.
+         Exemple de vue tree personnalisée si besoin :
+    <record id="view_hms_medicine_product_tree_custom" model="ir.ui.view">
+        <field name="name">hms.medicine.product.tree.custom</field>
+        <field name="model">product.product</field>
+        <field name="arch" type="xml">
+            <tree string="Medicines">
+                <field name="default_code"/>
+                <field name="name"/>
+                <field name="categ_id"/>
+                <field name="type"/>
+                <field name="qty_available" string="On Hand"/>
+                <field name="virtual_available" string="Forecasted"/>
+                <field name="uom_id"/>
+                <field name="lst_price"/>
+                <field name="standard_price"/>
+            </tree>
+        </field>
+    </record>
+    <field name="view_id" ref="view_hms_medicine_product_tree_custom"/> dans l'action si vous utilisez une vue tree personnalisée.
+    -->
+
+    <!-- Action pour les Prescriptions à Délivrer -->
+    <record id="action_hms_prescription_to_dispense" model="ir.actions.act_window">
+        <field name="name">Prescriptions to Dispense</field>
+        <field name="res_model">hms.prescription.line</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('is_dispensed', '=', False)]</field>
+        <field name="context">{'create': False, 'edit': False}</field> <!-- Empêcher la création/modification directe depuis cette vue -->
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No prescriptions pending dispensation.
+            </p>
+        </field>
+    </record>
+
+    <!-- Vue Tree pour les Prescriptions à Délivrer -->
+    <record id="view_hms_prescription_to_dispense_tree" model="ir.ui.view">
+        <field name="name">hms.prescription.to.dispense.tree</field>
+        <field name="model">hms.prescription.line</field>
+        <field name="arch" type="xml">
+            <tree string="Prescriptions to Dispense" create="false" edit="false" decoration-info="not is_dispensed">
+                <field name="medical_record_id" string="Medical Record"/>
+                <field name="patient_id" related="medical_record_id.patient_id" string="Patient"/>
+                <field name="doctor_id" related="medical_record_id.doctor_id" string="Prescribing Doctor"/>
+                <field name="drug_id"/>
+                <field name="qty_prescribed"/>
+                <field name="dosage"/>
+                <field name="frequency"/>
+                <field name="duration"/>
+                <field name="notes" optional="hide"/>
+                <button name="action_dispense_drug" type="object" string="Dispense" icon="fa-check-square-o"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Vue Form pour les Prescriptions à Délivrer (lecture seule) -->
+     <record id="view_hms_prescription_to_dispense_form" model="ir.ui.view">
+        <field name="name">hms.prescription.to.dispense.form</field>
+        <field name="model">hms.prescription.line</field>
+        <field name="arch" type="xml">
+            <form string="Prescription Line" create="false" edit="false">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="medical_record_id"/>
+                            <field name="patient_id" related="medical_record_id.patient_id"/>
+                            <field name="doctor_id" related="medical_record_id.doctor_id"/>
+                            <field name="drug_id"/>
+                        </group>
+                        <group>
+                            <field name="qty_prescribed"/>
+                            <field name="dosage"/>
+                            <field name="frequency"/>
+                            <field name="duration"/>
+                        </group>
+                    </group>
+                    <field name="notes" placeholder="Notes for this drug..."/>
+                     <group string="Dispensation Details" invisible="not is_dispensed">
+                        <field name="is_dispensed"/>
+                        <field name="qty_dispensed"/>
+                        <field name="dispense_date"/>
+                        <field name="dispensed_by_id"/>
+                    </group>
+                    <div class="oe_clear" invisible="is_dispensed == True">
+                        <button name="action_dispense_drug" type="object" string="Mark as Dispensed" class="oe_highlight"/>
+                    </div>
+                </sheet>
+            </form>
+        </field>
+    </record>
+</odoo>

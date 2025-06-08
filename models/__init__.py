@@ -5,3 +5,6 @@ from . import hms_medical_record
 from . import hms_department
 from . import hms_patient_insurance
 from . import hms_day_of_week
+from . import hms_prescription_line
+from . import product_template
+from . import product_product # Nouvelle ligne

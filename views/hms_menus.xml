@@ -1,30 +1,65 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!-- Main Menu -->
-    <menuitem id="menu_hms_root" name="Hospital Management" sequence="10" web_icon="hms,static/description/icon.png"/>
+    <!-- Menu racine pour HMS -->
+    <menuitem id="menu_hms_root"
+              name="Hôpital"
+              web_icon="hms,static/description/icon.png"
+              sequence="10"/>
 
-    <!-- Patient Management -->
-    <menuitem id="menu_hms_patient" name="Patients" parent="menu_hms_root" sequence="10"/>
-    <menuitem id="menu_hms_patient_list" name="All Patients" parent="menu_hms_patient" 
-              action="action_hms_patient" sequence="10"/>
+    <!-- Sous-menus principaux -->
+    <menuitem id="menu_hms_operations"
+              name="Opérations"
+              parent="menu_hms_root"
+              sequence="10"/>
 
-    <!-- Doctor Management -->
-    <menuitem id="menu_hms_doctor" name="Doctors" parent="menu_hms_root" sequence="20"/>
-    <menuitem id="menu_hms_doctor_list" name="All Doctors" parent="menu_hms_doctor" 
-              action="action_hms_doctor" sequence="10"/>
+    <menuitem id="menu_hms_patients"
+              name="Patients"
+              parent="menu_hms_root"
+              sequence="20"/>
 
-    <!-- Appointment Management -->
-    <menuitem id="menu_hms_appointment" name="Appointments" parent="menu_hms_root" sequence="30"/>
-    <menuitem id="menu_hms_appointment_list" name="All Appointments" parent="menu_hms_appointment" 
-              action="action_hms_appointment" sequence="10"/>
+    <menuitem id="menu_hms_staff"
+              name="Personnel"
+              parent="menu_hms_root"
+              sequence="30"/>
 
-    <!-- Medical Records -->
-    <menuitem id="menu_hms_medical_record" name="Medical Records" parent="menu_hms_root" sequence="40"/>
-    <menuitem id="menu_hms_medical_record_list" name="All Medical Records" parent="menu_hms_medical_record" 
-              action="action_hms_medical_record" sequence="10"/>
+    <menuitem id="menu_hms_pharmacy"
+              name="Pharmacie"
+              parent="menu_hms_root"
+              sequence="40"/>
 
-    <!-- Configuration -->
-    <menuitem id="menu_hms_config" name="Configuration" parent="menu_hms_root" sequence="50" groups="group_hms_manager"/>
-    <menuitem id="menu_hms_department_list" name="Departments" parent="menu_hms_config" 
-              action="action_hms_department" sequence="10"/>
+    <menuitem id="menu_hms_config"
+              name="Configuration"
+              parent="menu_hms_root"
+              sequence="100"/>
+
+    <!-- Actions liées aux menus -->
+    <menuitem id="menu_patient_records"
+              name="Patients"
+              parent="menu_hms_patients"
+              action="action_hms_patient"
+              sequence="10"/>
+
+    <menuitem id="menu_hms_appointments"
+              name="Rendez-vous"
+              parent="menu_hms_operations"
+              action="action_hms_appointment"
+              sequence="10"/>
+
+    <menuitem id="menu_hms_medical_records"
+              name="Dossiers Médicaux"
+              parent="menu_hms_operations"
+              action="action_hms_medical_record"
+              sequence="20"/>
+
+    <menuitem id="menu_hms_doctors"
+              name="Médecins"
+              parent="menu_hms_staff"
+              action="action_hms_doctor"
+              sequence="10"/>
+
+    <menuitem id="menu_hms_departments"
+              name="Départements"
+              parent="menu_hms_config"
+              action="action_hms_department"
+              sequence="10"/>
 </odoo>

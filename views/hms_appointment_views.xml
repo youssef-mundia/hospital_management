@@ -7,14 +7,15 @@
         <field name="arch" type="xml">
             <form string="Appointment">
                 <header>
-                    <button name="action_confirm" string="Confirm" type="object" 
-                            invisible="state != 'draft'" class="oe_highlight"/>
-                    <button name="action_start" string="Start" type="object" 
-                            invisible="state != 'confirmed'" class="oe_highlight"/>
-                    <button name="action_complete" string="Complete" type="object" 
-                            invisible="state != 'in_progress'" class="oe_highlight"/>
-                    <button name="action_cancel" string="Cancel" type="object" 
-                            invisible="state not in ('draft', 'confirmed')"/>
+                    <button name="action_confirm" string="Confirm" type="object" class="oe_highlight"
+                            invisible="state != 'draft'"/>
+                    <button name="action_start" string="Start Appointment" type="object" class="oe_highlight"
+                            invisible="state != 'confirmed'"/>
+                    <button name="action_complete" string="Mark as Completed" type="object" class="oe_highlight"
+                            invisible="state != 'in_progress'"/>
+                    <button name="action_cancel" string="Cancel" type="object"
+                            invisible="state in ('completed', 'cancelled')"
+                            confirm="Are you sure you want to cancel this appointment?"/>
                     <field name="state" widget="statusbar" statusbar_visible="draft,confirmed,in_progress,completed"/>
                 </header>
                 <sheet>
@@ -24,17 +25,22 @@
                         </h1>
                     </div>
                     <group>
-                        <group>
-                            <field name="patient_id" required="1"/>
-                            <field name="doctor_id" required="1"/>
-                            <field name="appointment_date"/>
+                        <group string="Main Information">
+                            <field name="patient_id" options="{'no_create_edit': True}" required="1"/>
+                            <field name="doctor_id"
+                                   domain="[('available_days.code', '=', appointment_date_day_code)]"
+                                   options="{'no_create_edit': True}"
+                                   required="1"/>
+                            <field name="appointment_type" required="1"/>
+                            <field name="priority" widget="priority" required="1"/>
                         </group>
-                        <group>
+                        <group string="Schedule">
+                            <field name="appointment_date" required="1"/>
+                            <field name="appointment_date_day_code" invisible="1"/>
                             <field name="duration"/>
-                            <field name="end_datetime"/>
+                            <field name="end_datetime" readonly="1"/>
                         </group>
                     </group>
-                    
                     <notebook>
                         <page string="Details">
                             <group>
@@ -42,11 +48,11 @@
                                 <field name="notes"/>
                             </group>
                         </page>
-                        
-                        <page string="Medical Records">
+                        <page string="Medical Records" invisible="state != 'completed'">
                             <field name="medical_record_ids">
                                 <tree>
                                     <field name="name"/>
+                                    <field name="doctor_id"/>
                                     <field name="date"/>
                                     <field name="diagnosis"/>
                                 </tree>
@@ -68,27 +74,17 @@
         <field name="name">hms.appointment.tree</field>
         <field name="model">hms.appointment</field>
         <field name="arch" type="xml">
-            <tree>
+            <tree string="Appointments" decoration-info="state=='draft'" decoration-muted="state=='cancelled'"
+                  decoration-success="state=='completed'" decoration-warning="state=='in_progress'">
                 <field name="name"/>
                 <field name="patient_id"/>
                 <field name="doctor_id"/>
                 <field name="appointment_date"/>
                 <field name="duration"/>
+                <field name="appointment_type"/>
+                <field name="priority" widget="priority"/>
                 <field name="state"/>
             </tree>
-        </field>
-    </record>
-
-    <!-- Appointment Calendar View -->
-    <record id="view_hms_appointment_calendar" model="ir.ui.view">
-        <field name="name">hms.appointment.calendar</field>
-        <field name="model">hms.appointment</field>
-        <field name="arch" type="xml">
-            <calendar string="Appointments" date_start="appointment_date" date_stop="end_datetime" color="doctor_id">
-                <field name="patient_id"/>
-                <field name="doctor_id"/>
-                <field name="state"/>
-            </calendar>
         </field>
     </record>
 
@@ -97,22 +93,89 @@
         <field name="name">hms.appointment.search</field>
         <field name="model">hms.appointment</field>
         <field name="arch" type="xml">
-            <search>
+            <search string="Search Appointments">
                 <field name="name"/>
                 <field name="patient_id"/>
                 <field name="doctor_id"/>
-                <filter string="Today" name="today" domain="[('appointment_date','&gt;=', datetime.datetime.now().replace(hour=0, minute=0, second=0)), ('appointment_date','&lt;=', datetime.datetime.now().replace(hour=23, minute=59, second=59))]"/>
-                <filter string="This Week" name="this_week" domain="[('appointment_date','&gt;=', (context_today() - datetime.timedelta(days=context_today().weekday())).strftime('%Y-%m-%d')), ('appointment_date','&lt;', (context_today() + datetime.timedelta(days=7-context_today().weekday())).strftime('%Y-%m-%d'))]"/>
-                <filter string="Draft" name="draft" domain="[('state','=','draft')]"/>
-                <filter string="Confirmed" name="confirmed" domain="[('state','=','confirmed')]"/>
-                <filter string="In Progress" name="in_progress" domain="[('state','=','in_progress')]"/>
-                <filter string="Completed" name="completed" domain="[('state','=','completed')]"/>
+                <field name="appointment_type"/>
+                <filter string="Draft" name="draft" domain="[('state', '=', 'draft')]"/>
+                <filter string="Confirmed" name="confirmed" domain="[('state', '=', 'confirmed')]"/>
+                <filter string="In Progress" name="in_progress" domain="[('state', '=', 'in_progress')]"/>
+                <filter string="Completed" name="completed" domain="[('state', '=', 'completed')]"/>
+                <filter string="Cancelled" name="cancelled" domain="[('state', '=', 'cancelled')]"/>
+                <separator/>
+                <filter string="Today" name="today"
+                        domain="[('appointment_date', '&gt;=', context_today().strftime('%Y-%m-%d 00:00:00')), ('appointment_date', '&lt;=', context_today().strftime('%Y-%m-%d 23:59:59'))]"/>
+                <filter string="Upcoming" name="upcoming"
+                        domain="[('appointment_date', '&gt;=', time.strftime('%Y-%m-%d %H:%M:%S'))]"/>
                 <group expand="0" string="Group By">
                     <filter string="Patient" name="group_patient" domain="[]" context="{'group_by':'patient_id'}"/>
                     <filter string="Doctor" name="group_doctor" domain="[]" context="{'group_by':'doctor_id'}"/>
                     <filter string="State" name="group_state" domain="[]" context="{'group_by':'state'}"/>
+                    <filter string="Appointment Type" name="group_appointment_type" domain="[]" context="{'group_by':'appointment_type'}"/>
+                    <filter string="Appointment Date" name="group_appointment_date" domain="[]" context="{'group_by':'appointment_date:day'}"/>
                 </group>
             </search>
+        </field>
+    </record>
+
+    <!-- Appointment Kanban View -->
+    <record id="view_hms_appointment_kanban" model="ir.ui.view">
+        <field name="name">hms.appointment.kanban</field>
+        <field name="model">hms.appointment</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="state" class="o_kanban_small_column">
+                <field name="state"/>
+                <field name="patient_id"/>
+                <field name="doctor_id"/>
+                <field name="appointment_date"/>
+                <field name="priority"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div t-attf-class="oe_kanban_global_click">
+                            <div class="o_kanban_record_top">
+                                <div class="o_kanban_record_headings">
+                                    <strong class="o_kanban_record_title">
+                                        <span><field name="display_name"/></span>
+                                    </strong>
+                                </div>
+                                <field name="priority" widget="priority"/>
+                            </div>
+                            <ul>
+                                <li>Patient: <field name="patient_id"/></li>
+                                <li>Doctor: <field name="doctor_id"/></li>
+                                <li>Date: <field name="appointment_date" widget="datetime"/></li>
+                            </ul>
+                            <div class="oe_kanban_bottom_right">
+                                <field name="state" widget="label_selection" options="{'classes': {'draft': 'default', 'confirmed': 'info', 'in_progress': 'warning', 'completed': 'success', 'cancelled': 'danger'}}"/>
+                            </div>
+                             <div class="o_kanban_record_bottom">
+                                <div class="oe_kanban_bottom_left">
+                                    <field name="activity_ids" widget="kanban_activity"/>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Appointment Calendar View -->
+    <record id="view_hms_appointment_calendar" model="ir.ui.view">
+        <field name="name">hms.appointment.calendar</field>
+        <field name="model">hms.appointment</field>
+        <field name="arch" type="xml">
+            <calendar string="Appointments"
+                      date_start="appointment_date"
+                      date_stop="end_datetime"
+                      color="doctor_id"
+                      mode="month">
+                <field name="patient_id" filters="1"/>
+                <field name="doctor_id" filters="1"/>
+                <field name="state" filters="1"/>
+                <field name="appointment_type"/>
+            </calendar>
         </field>
     </record>
 
@@ -120,10 +183,11 @@
     <record id="action_hms_appointment" model="ir.actions.act_window">
         <field name="name">Appointments</field>
         <field name="res_model">hms.appointment</field>
-        <field name="view_mode">tree,form,calendar</field>
+        <field name="view_mode">tree,form,kanban,calendar</field>
+        <field name="context">{'search_default_upcoming': 1}</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
-                Schedule your first appointment!
+                Create a new appointment.
             </p>
         </field>
     </record>
