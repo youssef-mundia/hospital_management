@@ -7,29 +7,31 @@
         <field name="arch" type="xml">
             <form string="Patient">
                 <sheet>
+                    <field name="image" widget="image" class="oe_avatar"/>
                     <div class="oe_title">
                         <h1>
                             <field name="patient_id" readonly="1"/>
                         </h1>
+                        <h2>
+                            <field name="name" placeholder="Patient's Name" required="1"/>
+                        </h2>
                     </div>
                     <group>
-                        <group>
-                            <field name="name" required="1"/>
+                        <group string="Personal Information">
                             <field name="date_of_birth"/>
-                            <field name="age"/>
+                            <field name="age_display" string="Age"/>
                             <field name="gender"/>
-                            <field name="blood_group"/>
+                            <field name="marital_status"/>
+                            <field name="occupation"/>
                         </group>
-                        <group>
+                        <group string="Contact Information">
                             <field name="phone"/>
                             <field name="mobile"/>
-                            <field name="email"/>
-                            <field name="active"/>
+                            <field name="email" widget="email"/>
                         </group>
                     </group>
-                    
                     <notebook>
-                        <page string="Contact Information">
+                        <page string="Address">
                             <group>
                                 <group>
                                     <field name="street"/>
@@ -43,28 +45,44 @@
                                 </group>
                             </group>
                         </page>
-                        
                         <page string="Medical Information">
                             <group>
+                                <field name="blood_group"/>
                                 <field name="allergies"/>
                                 <field name="medical_history"/>
                             </group>
                         </page>
-                        
                         <page string="Emergency Contact">
                             <group>
-                                <group>
-                                    <field name="emergency_contact_name"/>
-                                    <field name="emergency_contact_phone"/>
-                                </group>
-                                <group>
-                                    <field name="emergency_contact_relation"/>
-                                </group>
+                                <field name="emergency_contact_name"/>
+                                <field name="emergency_contact_phone"/>
+                                <field name="emergency_contact_relation"/>
                             </group>
                         </page>
-                        
+                        <page string="Insurances">
+                            <field name="insurance_ids">
+                                <tree editable="bottom">
+                                    <field name="insurance_company_id" required="1"/>
+                                    <field name="policy_number" required="1"/>
+                                    <field name="coverage_start_date"/>
+                                    <field name="coverage_end_date"/>
+                                    <field name="notes"/>
+                                </tree>
+                                <form>
+                                    <group>
+                                        <field name="insurance_company_id" required="1"/>
+                                        <field name="policy_number" required="1"/>
+                                    </group>
+                                    <group>
+                                        <field name="coverage_start_date"/>
+                                        <field name="coverage_end_date"/>
+                                    </group>
+                                    <field name="notes"/>
+                                </form>
+                            </field>
+                        </page>
                         <page string="Appointments">
-                            <field name="appointment_ids">
+                            <field name="appointment_ids" readonly="1">
                                 <tree>
                                     <field name="name"/>
                                     <field name="doctor_id"/>
@@ -73,9 +91,8 @@
                                 </tree>
                             </field>
                         </page>
-                        
                         <page string="Medical Records">
-                            <field name="medical_record_ids">
+                            <field name="medical_record_ids" readonly="1">
                                 <tree>
                                     <field name="name"/>
                                     <field name="doctor_id"/>
@@ -103,11 +120,12 @@
             <tree>
                 <field name="patient_id"/>
                 <field name="name"/>
-                <field name="age"/>
+                <field name="date_of_birth"/>
+                <field name="age_display" string="Age"/>
                 <field name="gender"/>
                 <field name="phone"/>
-                <field name="blood_group"/>
-                <field name="active"/>
+                <field name="email"/>
+                <field name="active" invisible="1"/>
             </tree>
         </field>
     </record>
@@ -121,9 +139,10 @@
                 <field name="name"/>
                 <field name="patient_id"/>
                 <field name="phone"/>
-                <field name="mobile"/>
-                <filter string="Active" name="active" domain="[('active','=',True)]"/>
-                <filter string="Inactive" name="inactive" domain="[('active','=',False)]"/>
+                <field name="email"/>
+                <field name="gender"/>
+                <field name="blood_group"/>
+                <filter string="Archived" name="inactive" domain="[('active','=',False)]"/>
                 <group expand="0" string="Group By">
                     <filter string="Gender" name="group_gender" domain="[]" context="{'group_by':'gender'}"/>
                     <filter string="Blood Group" name="group_blood_group" domain="[]" context="{'group_by':'blood_group'}"/>

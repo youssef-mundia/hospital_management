@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Patient Insurance Tree View -->
+    <record id="view_hms_patient_insurance_tree" model="ir.ui.view">
+        <field name="name">hms.patient.insurance.tree</field>
+        <field name="model">hms.patient.insurance</field>
+        <field name="arch" type="xml">
+            <tree string="Patient Insurances" editable="bottom">
+                <field name="patient_id" invisible="1"/> <!-- Souvent implicite dans le contexte one2many -->
+                <field name="insurance_company_id" required="1"/>
+                <field name="policy_number" required="1"/>
+                <field name="coverage_start_date"/>
+                <field name="coverage_end_date"/>
+                <field name="notes"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Patient Insurance Form View -->
+    <record id="view_hms_patient_insurance_form" model="ir.ui.view">
+        <field name="name">hms.patient.insurance.form</field>
+        <field name="model">hms.patient.insurance</field>
+        <field name="arch" type="xml">
+            <form string="Patient Insurance">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="patient_id" required="1" options="{'no_create': True, 'no_open': True}"/>
+                            <field name="insurance_company_id" required="1" domain="[('is_company', '=', True)]" options="{'no_create': True}"/>
+                            <field name="policy_number" required="1"/>
+                        </group>
+                        <group>
+                            <field name="coverage_start_date"/>
+                            <field name="coverage_end_date"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Notes">
+                            <field name="notes"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Optionnel: Action pour accéder directement aux assurances si nécessaire -->
+    <!--
+    <record id="action_hms_patient_insurance" model="ir.actions.act_window">
+        <field name="name">Patient Insurances</field>
+        <field name="res_model">hms.patient.insurance</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+    -->
+
+    <!-- Optionnel: Menu item si une action est définie et que vous voulez un accès direct -->
+    <!--
+    <menuitem id="menu_hms_patient_insurance"
+              name="Patient Insurances"
+              parent="menu_hms_patient" // ou menu_hms_config
+              action="action_hms_patient_insurance"
+              sequence="20"/>
+    -->
+</odoo>

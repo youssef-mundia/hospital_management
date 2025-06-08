@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1"> <!-- noupdate="1" pour éviter la suppression/modification lors des mises à jour du module -->
+        <record id="hms_day_monday" model="hms.day.of.week">
+            <field name="name">Monday</field>
+            <field name="code">monday</field>
+            <field name="sequence">1</field>
+        </record>
+        <record id="hms_day_tuesday" model="hms.day.of.week">
+            <field name="name">Tuesday</field>
+            <field name="code">tuesday</field>
+            <field name="sequence">2</field>
+        </record>
+        <record id="hms_day_wednesday" model="hms.day.of.week">
+            <field name="name">Wednesday</field>
+            <field name="code">wednesday</field>
+            <field name="sequence">3</field>
+        </record>
+        <record id="hms_day_thursday" model="hms.day.of.week">
+            <field name="name">Thursday</field>
+            <field name="code">thursday</field>
+            <field name="sequence">4</field>
+        </record>
+        <record id="hms_day_friday" model="hms.day.of.week">
+            <field name="name">Friday</field>
+            <field name="code">friday</field>
+            <field name="sequence">5</field>
+        </record>
+        <record id="hms_day_saturday" model="hms.day.of.week">
+            <field name="name">Saturday</field>
+            <field name="code">saturday</field>
+            <field name="sequence">6</field>
+        </record>
+        <record id="hms_day_sunday" model="hms.day.of.week">
+            <field name="name">Sunday</field>
+            <field name="code">sunday</field>
+            <field name="sequence">7</field>
+        </record>
+    </data>
+</odoo>

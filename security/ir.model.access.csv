@@ -14,3 +14,8 @@ access_hms_medical_record_manager,hms.medical.record.manager,model_hms_medical_r
 access_hms_department_user,hms.department.user,model_hms_department,group_hms_user,1,0,0,0
 access_hms_department_doctor,hms.department.doctor,model_hms_department,group_hms_doctor,1,0,0,0
 access_hms_department_manager,hms.department.manager,model_hms_department,group_hms_manager,1,1,1,1
+access_hms_patient_insurance_user,hms.patient.insurance.user,model_hms_patient_insurance,group_hms_user,1,1,1,0
+access_hms_patient_insurance_doctor,hms.patient.insurance.doctor,model_hms_patient_insurance,group_hms_doctor,1,1,1,0
+access_hms_patient_insurance_manager,hms.patient.insurance.manager,model_hms_patient_insurance,group_hms_manager,1,1,1,1
+access_hms_day_of_week_user,hms.day.of.week.user,model_hms_day_of_week,base.group_user,1,0,0,0
+access_hms_day_of_week_manager,hms.day.of.week.manager,model_hms_day_of_week,group_hms_manager,1,1,1,1
