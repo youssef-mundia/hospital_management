@@ -24,9 +24,11 @@
     </record>
 
     <!-- Vue Tree pour les Médicaments (peut utiliser la vue standard ou être personnalisée) -->
-    <!-- Nous utilisons la vue par défaut de product.product, l'action ci-dessus la filtre déjà.
-         Si une vue spécifique est nécessaire, elle peut être définie ici.
-         Exemple de vue tree personnalisée si besoin :
+    <!--
+    Nous utilisons la vue par défaut de product.product, l'action ci-dessus la filtre déjà.
+    Si une vue spécifique est nécessaire, elle peut être définie ici.
+    Exemple de vue tree personnalisée si besoin :
+
     <record id="view_hms_medicine_product_tree_custom" model="ir.ui.view">
         <field name="name">hms.medicine.product.tree.custom</field>
         <field name="model">product.product</field>
@@ -44,7 +46,8 @@
             </tree>
         </field>
     </record>
-    <field name="view_id" ref="view_hms_medicine_product_tree_custom"/> dans l'action si vous utilisez une vue tree personnalisée.
+
+    Et ajouter <field name="view_id" ref="view_hms_medicine_product_tree_custom"/> dans l'action si vous utilisez une vue tree personnalisée.
     -->
 
     <!-- Action pour les Prescriptions à Délivrer -->
@@ -53,7 +56,7 @@
         <field name="res_model">hms.prescription.line</field>
         <field name="view_mode">tree,form</field>
         <field name="domain">[('is_dispensed', '=', False)]</field>
-        <field name="context">{'create': False, 'edit': False}</field> <!-- Empêcher la création/modification directe depuis cette vue -->
+        <field name="context">{'create': False, 'edit': False}</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
                 No prescriptions pending dispensation.
@@ -82,7 +85,7 @@
     </record>
 
     <!-- Vue Form pour les Prescriptions à Délivrer (lecture seule) -->
-     <record id="view_hms_prescription_to_dispense_form" model="ir.ui.view">
+    <record id="view_hms_prescription_to_dispense_form" model="ir.ui.view">
         <field name="name">hms.prescription.to.dispense.form</field>
         <field name="model">hms.prescription.line</field>
         <field name="arch" type="xml">
@@ -103,7 +106,7 @@
                         </group>
                     </group>
                     <field name="notes" placeholder="Notes for this drug..."/>
-                     <group string="Dispensation Details" invisible="not is_dispensed">
+                    <group string="Dispensation Details" invisible="not is_dispensed">
                         <field name="is_dispensed"/>
                         <field name="qty_dispensed"/>
                         <field name="dispense_date"/>
