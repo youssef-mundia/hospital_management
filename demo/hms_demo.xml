@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Demo Departments -->
+    <record id="demo_department_cardiology" model="hms.department">
+        <field name="name">Cardiology</field>
+        <field name="code">CARD</field>
+        <field name="description">Department specializing in heart and cardiovascular system disorders</field>
+    </record>
+
+    <record id="demo_department_orthopedics" model="hms.department">
+        <field name="name">Orthopedics</field>
+        <field name="code">ORTH</field>
+        <field name="description">Department specializing in musculoskeletal system disorders</field>
+    </record>
+
+    <!-- Demo Doctors -->
+    <record id="demo_doctor_smith" model="hms.doctor">
+        <field name="name">John Smith</field>
+        <field name="specialization">Cardiologist</field>
+        <field name="department_id" ref="demo_department_cardiology"/>
+        <field name="license_number">MD12345</field>
+        <field name="experience_years">15</field>
+        <field name="consultation_fee">150.00</field>
+        <field name="phone">+1234567890</field>
+        <field name="email">dr.smith@hospital.com</field>
+    </record>
+
+    <record id="demo_doctor_johnson" model="hms.doctor">
+        <field name="name">Sarah Johnson</field>
+        <field name="specialization">Orthopedic Surgeon</field>
+        <field name="department_id" ref="demo_department_orthopedics"/>
+        <field name="license_number">MD67890</field>
+        <field name="experience_years">10</field>
+        <field name="consultation_fee">200.00</field>
+        <field name="phone">+1234567891</field>
+        <field name="email">dr.johnson@hospital.com</field>
+    </record>
+
+    <!-- Demo Patients -->
+    <record id="demo_patient_doe" model="hms.patient">
+        <field name="name">John Doe</field>
+        <field name="date_of_birth">1980-05-15</field>
+        <field name="gender">male</field>
+        <field name="blood_group">O+</field>
+        <field name="phone">+1987654321</field>
+        <field name="email">john.doe@email.com</field>
+        <field name="street">123 Main Street</field>
+        <field name="city">New York</field>
+        <field name="zip">10001</field>
+    </record>
+
+    <record id="demo_patient_smith" model="hms.patient">
+        <field name="name">Jane Smith</field>
+        <field name="date_of_birth">1975-08-22</field>
+        <field name="gender">female</field>
+        <field name="blood_group">A+</field>
+        <field name="phone">+1987654322</field>
+        <field name="email">jane.smith@email.com</field>
+        <field name="street">456 Oak Avenue</field>
+        <field name="city">Los Angeles</field>
+        <field name="zip">90210</field>
+    </record>
+</odoo>

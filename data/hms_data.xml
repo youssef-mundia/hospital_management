@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Sequence for Patient ID -->
+    <record id="seq_hms_patient" model="ir.sequence">
+        <field name="name">HMS Patient Sequence</field>
+        <field name="code">hms.patient</field>
+        <field name="prefix">PAT</field>
+        <field name="padding">5</field>
+        <field name="company_id" eval="False"/>
+    </record>
+
+    <!-- Sequence for Doctor ID -->
+    <record id="seq_hms_doctor" model="ir.sequence">
+        <field name="name">HMS Doctor Sequence</field>
+        <field name="code">hms.doctor</field>
+        <field name="prefix">DOC</field>
+        <field name="padding">5</field>
+        <field name="company_id" eval="False"/>
+    </record>
+
+    <!-- Sequence for Appointment -->
+    <record id="seq_hms_appointment" model="ir.sequence">
+        <field name="name">HMS Appointment Sequence</field>
+        <field name="code">hms.appointment</field>
+        <field name="prefix">APT</field>
+        <field name="padding">5</field>
+        <field name="company_id" eval="False"/>
+    </record>
+
+    <!-- Sequence for Medical Record -->
+    <record id="seq_hms_medical_record" model="ir.sequence">
+        <field name="name">HMS Medical Record Sequence</field>
+        <field name="code">hms.medical.record</field>
+        <field name="prefix">MR</field>
+        <field name="padding">5</field>
+        <field name="company_id" eval="False"/>
+    </record>
+</odoo>

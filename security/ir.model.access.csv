@@ -1,0 +1,16 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_hms_patient_user,hms.patient.user,model_hms_patient,group_hms_user,1,1,1,0
+access_hms_patient_doctor,hms.patient.doctor,model_hms_patient,group_hms_doctor,1,1,1,0
+access_hms_patient_manager,hms.patient.manager,model_hms_patient,group_hms_manager,1,1,1,1
+access_hms_doctor_user,hms.doctor.user,model_hms_doctor,group_hms_user,1,0,0,0
+access_hms_doctor_doctor,hms.doctor.doctor,model_hms_doctor,group_hms_doctor,1,1,0,0
+access_hms_doctor_manager,hms.doctor.manager,model_hms_doctor,group_hms_manager,1,1,1,1
+access_hms_appointment_user,hms.appointment.user,model_hms_appointment,group_hms_user,1,1,1,0
+access_hms_appointment_doctor,hms.appointment.doctor,model_hms_appointment,group_hms_doctor,1,1,1,0
+access_hms_appointment_manager,hms.appointment.manager,model_hms_appointment,group_hms_manager,1,1,1,1
+access_hms_medical_record_user,hms.medical.record.user,model_hms_medical_record,group_hms_user,1,0,0,0
+access_hms_medical_record_doctor,hms.medical.record.doctor,model_hms_medical_record,group_hms_doctor,1,1,1,0
+access_hms_medical_record_manager,hms.medical.record.manager,model_hms_medical_record,group_hms_manager,1,1,1,1
+access_hms_department_user,hms.department.user,model_hms_department,group_hms_user,1,0,0,0
+access_hms_department_doctor,hms.department.doctor,model_hms_department,group_hms_doctor,1,0,0,0
+access_hms_department_manager,hms.department.manager,model_hms_department,group_hms_manager,1,1,1,1

@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Medical Record Form View -->
+    <record id="view_hms_medical_record_form" model="ir.ui.view">
+        <field name="name">hms.medical.record.form</field>
+        <field name="model">hms.medical.record</field>
+        <field name="arch" type="xml">
+            <form string="Medical Record">
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="patient_id" required="1"/>
+                            <field name="doctor_id" required="1"/>
+                            <field name="appointment_id"/>
+                        </group>
+                        <group>
+                            <field name="date"/>
+                        </group>
+                    </group>
+                    
+                    <notebook>
+                        <page string="Medical Information">
+                            <group>
+                                <field name="chief_complaint"/>
+                                <field name="symptoms"/>
+                                <field name="diagnosis"/>
+                                <field name="treatment"/>
+                                <field name="prescription"/>
+                                <field name="recommendations"/>
+                            </group>
+                        </page>
+                        
+                        <page string="Vital Signs">
+                            <group>
+                                <group>
+                                    <field name="temperature"/>
+                                    <field name="blood_pressure_systolic"/>
+                                    <field name="blood_pressure_diastolic"/>
+                                </group>
+                                <group>
+                                    <field name="heart_rate"/>
+                                    <field name="weight"/>
+                                    <field name="height"/>
+                                </group>
+                            </group>
+                        </page>
+                        
+                        <page string="Follow-up">
+                            <group>
+                                <field name="follow_up_required"/>
+                                <field name="follow_up_date" invisible="not follow_up_required"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- Medical Record Tree View -->
+    <record id="view_hms_medical_record_tree" model="ir.ui.view">
+        <field name="name">hms.medical.record.tree</field>
+        <field name="model">hms.medical.record</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="patient_id"/>
+                <field name="doctor_id"/>
+                <field name="date"/>
+                <field name="diagnosis"/>
+                <field name="follow_up_required"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Medical Record Search View -->
+    <record id="view_hms_medical_record_search" model="ir.ui.view">
+        <field name="name">hms.medical.record.search</field>
+        <field name="model">hms.medical.record</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="patient_id"/>
+                <field name="doctor_id"/>
+                <field name="diagnosis"/>
+                <filter string="Follow-up Required" name="follow_up_required" domain="[('follow_up_required','=',True)]"/>
+                <filter string="Today" name="today" domain="[('date','&gt;=', datetime.datetime.now().replace(hour=0, minute=0, second=0)), ('date','&lt;=', datetime.datetime.now().replace(hour=23, minute=59, second=59))]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Patient" name="group_patient" domain="[]" context="{'group_by':'patient_id'}"/>
+                    <filter string="Doctor" name="group_doctor" domain="[]" context="{'group_by':'doctor_id'}"/>
+                    <filter string="Date" name="group_date" domain="[]" context="{'group_by':'date'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Medical Record Action -->
+    <record id="action_hms_medical_record" model="ir.actions.act_window">
+        <field name="name">Medical Records</field>
+        <field name="res_model">hms.medical.record</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first medical record!
+            </p>
+        </field>
+    </record>
+</odoo>

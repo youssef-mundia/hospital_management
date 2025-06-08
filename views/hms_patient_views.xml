@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Patient Form View -->
+    <record id="view_hms_patient_form" model="ir.ui.view">
+        <field name="name">hms.patient.form</field>
+        <field name="model">hms.patient</field>
+        <field name="arch" type="xml">
+            <form string="Patient">
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="patient_id" readonly="1"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="name" required="1"/>
+                            <field name="date_of_birth"/>
+                            <field name="age"/>
+                            <field name="gender"/>
+                            <field name="blood_group"/>
+                        </group>
+                        <group>
+                            <field name="phone"/>
+                            <field name="mobile"/>
+                            <field name="email"/>
+                            <field name="active"/>
+                        </group>
+                    </group>
+                    
+                    <notebook>
+                        <page string="Contact Information">
+                            <group>
+                                <group>
+                                    <field name="street"/>
+                                    <field name="street2"/>
+                                    <field name="city"/>
+                                </group>
+                                <group>
+                                    <field name="state_id"/>
+                                    <field name="zip"/>
+                                    <field name="country_id"/>
+                                </group>
+                            </group>
+                        </page>
+                        
+                        <page string="Medical Information">
+                            <group>
+                                <field name="allergies"/>
+                                <field name="medical_history"/>
+                            </group>
+                        </page>
+                        
+                        <page string="Emergency Contact">
+                            <group>
+                                <group>
+                                    <field name="emergency_contact_name"/>
+                                    <field name="emergency_contact_phone"/>
+                                </group>
+                                <group>
+                                    <field name="emergency_contact_relation"/>
+                                </group>
+                            </group>
+                        </page>
+                        
+                        <page string="Appointments">
+                            <field name="appointment_ids">
+                                <tree>
+                                    <field name="name"/>
+                                    <field name="doctor_id"/>
+                                    <field name="appointment_date"/>
+                                    <field name="state"/>
+                                </tree>
+                            </field>
+                        </page>
+                        
+                        <page string="Medical Records">
+                            <field name="medical_record_ids">
+                                <tree>
+                                    <field name="name"/>
+                                    <field name="doctor_id"/>
+                                    <field name="date"/>
+                                    <field name="diagnosis"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- Patient Tree View -->
+    <record id="view_hms_patient_tree" model="ir.ui.view">
+        <field name="name">hms.patient.tree</field>
+        <field name="model">hms.patient</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="patient_id"/>
+                <field name="name"/>
+                <field name="age"/>
+                <field name="gender"/>
+                <field name="phone"/>
+                <field name="blood_group"/>
+                <field name="active"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Patient Search View -->
+    <record id="view_hms_patient_search" model="ir.ui.view">
+        <field name="name">hms.patient.search</field>
+        <field name="model">hms.patient</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="patient_id"/>
+                <field name="phone"/>
+                <field name="mobile"/>
+                <filter string="Active" name="active" domain="[('active','=',True)]"/>
+                <filter string="Inactive" name="inactive" domain="[('active','=',False)]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Gender" name="group_gender" domain="[]" context="{'group_by':'gender'}"/>
+                    <filter string="Blood Group" name="group_blood_group" domain="[]" context="{'group_by':'blood_group'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Patient Action -->
+    <record id="action_hms_patient" model="ir.actions.act_window">
+        <field name="name">Patients</field>
+        <field name="res_model">hms.patient</field>
+        <field name="view_mode">tree,form</field>
+        <field name="context">{'search_default_active': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first patient!
+            </p>
+        </field>
+    </record>
+</odoo>

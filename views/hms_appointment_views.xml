@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Appointment Form View -->
+    <record id="view_hms_appointment_form" model="ir.ui.view">
+        <field name="name">hms.appointment.form</field>
+        <field name="model">hms.appointment</field>
+        <field name="arch" type="xml">
+            <form string="Appointment">
+                <header>
+                    <button name="action_confirm" string="Confirm" type="object" 
+                            invisible="state != 'draft'" class="oe_highlight"/>
+                    <button name="action_start" string="Start" type="object" 
+                            invisible="state != 'confirmed'" class="oe_highlight"/>
+                    <button name="action_complete" string="Complete" type="object" 
+                            invisible="state != 'in_progress'" class="oe_highlight"/>
+                    <button name="action_cancel" string="Cancel" type="object" 
+                            invisible="state not in ('draft', 'confirmed')"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,confirmed,in_progress,completed"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="patient_id" required="1"/>
+                            <field name="doctor_id" required="1"/>
+                            <field name="appointment_date"/>
+                        </group>
+                        <group>
+                            <field name="duration"/>
+                            <field name="end_datetime"/>
+                        </group>
+                    </group>
+                    
+                    <notebook>
+                        <page string="Details">
+                            <group>
+                                <field name="reason"/>
+                                <field name="notes"/>
+                            </group>
+                        </page>
+                        
+                        <page string="Medical Records">
+                            <field name="medical_record_ids">
+                                <tree>
+                                    <field name="name"/>
+                                    <field name="date"/>
+                                    <field name="diagnosis"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- Appointment Tree View -->
+    <record id="view_hms_appointment_tree" model="ir.ui.view">
+        <field name="name">hms.appointment.tree</field>
+        <field name="model">hms.appointment</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="patient_id"/>
+                <field name="doctor_id"/>
+                <field name="appointment_date"/>
+                <field name="duration"/>
+                <field name="state"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Appointment Calendar View -->
+    <record id="view_hms_appointment_calendar" model="ir.ui.view">
+        <field name="name">hms.appointment.calendar</field>
+        <field name="model">hms.appointment</field>
+        <field name="arch" type="xml">
+            <calendar string="Appointments" date_start="appointment_date" date_stop="end_datetime" color="doctor_id">
+                <field name="patient_id"/>
+                <field name="doctor_id"/>
+                <field name="state"/>
+            </calendar>
+        </field>
+    </record>
+
+    <!-- Appointment Search View -->
+    <record id="view_hms_appointment_search" model="ir.ui.view">
+        <field name="name">hms.appointment.search</field>
+        <field name="model">hms.appointment</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="patient_id"/>
+                <field name="doctor_id"/>
+                <filter string="Today" name="today" domain="[('appointment_date','&gt;=', datetime.datetime.now().replace(hour=0, minute=0, second=0)), ('appointment_date','&lt;=', datetime.datetime.now().replace(hour=23, minute=59, second=59))]"/>
+                <filter string="This Week" name="this_week" domain="[('appointment_date','&gt;=', (context_today() - datetime.timedelta(days=context_today().weekday())).strftime('%Y-%m-%d')), ('appointment_date','&lt;', (context_today() + datetime.timedelta(days=7-context_today().weekday())).strftime('%Y-%m-%d'))]"/>
+                <filter string="Draft" name="draft" domain="[('state','=','draft')]"/>
+                <filter string="Confirmed" name="confirmed" domain="[('state','=','confirmed')]"/>
+                <filter string="In Progress" name="in_progress" domain="[('state','=','in_progress')]"/>
+                <filter string="Completed" name="completed" domain="[('state','=','completed')]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Patient" name="group_patient" domain="[]" context="{'group_by':'patient_id'}"/>
+                    <filter string="Doctor" name="group_doctor" domain="[]" context="{'group_by':'doctor_id'}"/>
+                    <filter string="State" name="group_state" domain="[]" context="{'group_by':'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Appointment Action -->
+    <record id="action_hms_appointment" model="ir.actions.act_window">
+        <field name="name">Appointments</field>
+        <field name="res_model">hms.appointment</field>
+        <field name="view_mode">tree,form,calendar</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Schedule your first appointment!
+            </p>
+        </field>
+    </record>
+</odoo>
