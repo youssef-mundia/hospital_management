@@ -1,122 +1,168 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!-- Action pour les Médicaments (Produits filtrés) -->
-    <!-- Proposer 'produit stockable' par défaut -->
-    <record id="action_hms_medicine_product" model="ir.actions.act_window">
-        <field name="name">Medicines</field>
-        <field name="res_model">product.product</field>
-        <field name="view_mode">tree,form,kanban</field>
-        <field name="domain">[('is_medicine', '=', True), ('type', 'in', ['product', 'consu'])]</field>
-        <field name="context">{
-            'default_is_medicine': True,
-            'default_type': 'product',
-            'search_default_filter_to_sell': 0,
-            'search_default_filter_storable': 1
-        }</field>
-        <field name="help" type="html">
-            <p class="o_view_nocontent_smiling_face">
-                No medicines found. Create new medicines here.
-            </p><p>
-                Ensure medicines are set as 'Storable Product' or 'Consumable' and marked as 'Is a Medicine'.
-                Stock levels are shown for 'Storable Products'.
-            </p>
-        </field>
-    </record>
-
-    <!-- Vue Tree pour les Médicaments (peut utiliser la vue standard ou être personnalisée) -->
-    <!--
-    Nous utilisons la vue par défaut de product.product, l'action ci-dessus la filtre déjà.
-    Si une vue spécifique est nécessaire, elle peut être définie ici.
-    Exemple de vue tree personnalisée si besoin :
-
-    <record id="view_hms_medicine_product_tree_custom" model="ir.ui.view">
-        <field name="name">hms.medicine.product.tree.custom</field>
-        <field name="model">product.product</field>
+    <!-- Tree View for Prescription Lines (Pharmacy) -->
+    <record id="view_hms_prescription_line_pharmacy_tree" model="ir.ui.view">
+        <field name="name">hms.prescription.line.pharmacy.tree</field>
+        <field name="model">hms.prescription.line</field>
         <field name="arch" type="xml">
-            <tree string="Medicines">
-                <field name="default_code"/>
-                <field name="name"/>
-                <field name="categ_id"/>
-                <field name="type"/>
-                <field name="qty_available" string="On Hand"/>
-                <field name="virtual_available" string="Forecasted"/>
-                <field name="uom_id"/>
-                <field name="lst_price"/>
-                <field name="standard_price"/>
+            <tree string="Prescription Lines for Dispensing"
+                  decoration-info="state == 'pending'"
+                  decoration-success="state == 'dispensed'"
+                  decoration-danger="state == 'cancelled'"
+                  decoration-warning="state == 'not_available'">
+
+                <field name="name" readonly="1" optional="show"/>
+                <field name="prescription_date" readonly="1"/>
+                <field name="patient_id" readonly="1"/>
+                <field name="product_id" readonly="1" required="1"/>
+                <field name="qty_prescribed" readonly="1"/>
+                <field name="qty_dispensed" readonly="state != 'pending'"/>
+                <field name="state" readonly="1" widget="badge"/>
+                <field name="doctor_id" readonly="1" optional="show"/>
+                <field name="medical_record_id" readonly="1" optional="hide"/>
+                <field name="dispensed_by_id" readonly="1" optional="hide"/>
+                <field name="dispense_date" readonly="1" optional="hide"/>
+                <field name="dosage" readonly="1" optional="hide"/>
+                <field name="frequency" readonly="1" optional="hide"/>
+                <field name="duration" readonly="1" optional="hide"/>
+                <field name="notes" readonly="1" optional="hide"/>
+                <field name="invoice_id" readonly="1" optional="show"/>
+                <field name="picking_id" readonly="1" optional="show"/>
             </tree>
         </field>
     </record>
 
-    Et ajouter <field name="view_id" ref="view_hms_medicine_product_tree_custom"/> dans l'action si vous utilisez une vue tree personnalisée.
-    -->
+    <!-- Form View for Prescription Lines (Pharmacy) -->
+    <record id="view_hms_prescription_line_pharmacy_form" model="ir.ui.view">
+        <field name="name">hms.prescription.line.pharmacy.form</field>
+        <field name="model">hms.prescription.line</field>
+        <field name="arch" type="xml">
+            <form string="Prescription Line Dispensing">
+                <header>
+                    <button name="action_dispense" string="Dispense" type="object" class="oe_highlight"
+                            invisible="state != 'pending'"
+                            confirm="Are you sure you want to dispense this item?"/>
+                    <button name="action_mark_not_available" string="Mark Not Available" type="object"
+                            invisible="state != 'pending'"/>
+                    <button name="action_cancel_dispense" string="Cancel Dispense" type="object"
+                            invisible="state not in ['dispensed', 'not_available']"
+                            confirm="Are you sure you want to cancel dispensing this item?"/>
+                    <button name="action_reset_to_pending" string="Reset to Pending" type="object"
+                            invisible="state not in ['dispensed', 'cancelled', 'not_available']"
+                            confirm="Are you sure you want to reset this item to pending?"/>
+                    <field name="state" widget="statusbar" statusbar_visible="pending,dispensed,not_available,cancelled"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group string="Prescription Information">
+                        <group>
+                            <field name="medical_record_id" readonly="1"/>
+                            <field name="patient_id" readonly="1"/>
+                            <field name="doctor_id" readonly="1"/>
+                            <field name="prescription_date" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="product_id" readonly="1" required="1"/>
+                            <field name="qty_prescribed" readonly="1"/>
+                            <field name="dosage" readonly="1"/>
+                            <field name="frequency" readonly="1"/>
+                            <field name="duration" readonly="1"/>
+                        </group>
+                    </group>
+                    <group string="Dispensing Details">
+                        <group>
+                            <field name="qty_dispensed" readonly="state != 'pending'"/>
+                        </group>
+                        <group>
+                            <field name="dispensed_by_id" readonly="1"/>
+                            <field name="dispense_date" readonly="1"/>
+                        </group>
+                    </group>
+                    <group string="Financial Information">
+                        <group>
+                            <field name="invoice_id" readonly="1"/>
+                            <button name="action_view_invoice" type="object" string="View Invoice"
+                                    class="oe_link" invisible="not invoice_id"/>
+                            <field name="invoice_line_id" readonly="1" invisible="1"/>
+                        </group>
+                    </group>
+                    <group string="Stock Information">
+                        <group>
+                            <field name="picking_id" readonly="1"/>
+                            <button name="action_view_picking" type="object" string="View Delivery Order"
+                                    class="oe_link" invisible="not picking_id"/>
+                        </group>
+                        <group>
+                            <field name="stock_move_id" readonly="1"/>
+                            <button name="action_view_stock_move" type="object" string="View Stock Move"
+                                    class="oe_link" invisible="not stock_move_id"/>
+                        </group>
+                    </group>
+                    <label for="notes" string="Notes"/>
+                    <field name="notes" readonly="1"/>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
 
-    <!-- Action pour les Prescriptions à Délivrer -->
-    <record id="action_hms_prescription_to_dispense" model="ir.actions.act_window">
-        <field name="name">Prescriptions to Dispense</field>
+    <!-- Search View for Prescription Lines (Pharmacy) -->
+    <record id="view_hms_prescription_line_pharmacy_search" model="ir.ui.view">
+        <field name="name">hms.prescription.line.pharmacy.search</field>
+        <field name="model">hms.prescription.line</field>
+        <field name="arch" type="xml">
+            <search string="Search Prescription Lines">
+                <field name="name" string="Reference"/>
+                <field name="patient_id"/>
+                <field name="product_id"/>
+                <field name="medical_record_id"/>
+                <field name="doctor_id"/>
+                <field name="state"/>
+                <field name="prescription_date"/>
+                <separator/>
+                <filter string="Pending" name="pending" domain="[('state', '=', 'pending')]"/>
+                <filter string="Dispensed" name="dispensed" domain="[('state', '=', 'dispensed')]"/>
+                <filter string="Cancelled" name="cancelled" domain="[('state', '=', 'cancelled')]"/>
+                <filter string="Not Available" name="not_available" domain="[('state', '=', 'not_available')]"/>
+                <filter string="Has Invoice" name="has_invoice" domain="[('invoice_id', '!=', False)]"/>
+                <filter string="Has Stock Move" name="has_stock_move" domain="[('stock_move_id', '!=', False)]"/>
+                <separator/>
+                <filter string="Today" name="filter_today"
+                        domain="[('prescription_date', '&gt;=', datetime.datetime.combine(context_today(), datetime.time(0,0,0)))]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Patient" name="group_by_patient" context="{'group_by':'patient_id'}"/>
+                    <filter string="Doctor" name="group_by_doctor" context="{'group_by':'doctor_id'}"/>
+                    <filter string="Status" name="group_by_state" context="{'group_by':'state'}"/>
+                    <filter string="Prescription Date" name="group_by_date" context="{'group_by':'prescription_date:day'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action for Prescription Dispensing -->
+    <record id="action_hms_prescription_line_pharmacy" model="ir.actions.act_window">
+        <field name="name">Prescription Dispensing</field>
         <field name="res_model">hms.prescription.line</field>
         <field name="view_mode">tree,form</field>
-        <field name="domain">[('is_dispensed', '=', False)]</field>
-        <field name="context">{'create': False, 'edit': False}</field>
+        <field name="view_ids" eval="[(5, 0, 0),
+            (0, 0, {'view_mode': 'tree', 'view_id': ref('view_hms_prescription_line_pharmacy_tree')}),
+            (0, 0, {'view_mode': 'form', 'view_id': ref('view_hms_prescription_line_pharmacy_form')})]"/>
+        <field name="search_view_id" ref="view_hms_prescription_line_pharmacy_search"/>
+        <field name="context">{'search_default_pending': 1, 'search_default_group_by_patient': 1}</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
-                No prescriptions pending dispensation.
+                No prescription lines found.
             </p>
-        </field>
-    </record>
-
-    <!-- Vue Tree pour les Prescriptions à Délivrer -->
-    <record id="view_hms_prescription_to_dispense_tree" model="ir.ui.view">
-        <field name="name">hms.prescription.to.dispense.tree</field>
-        <field name="model">hms.prescription.line</field>
-        <field name="arch" type="xml">
-            <tree string="Prescriptions to Dispense" create="false" edit="false" decoration-info="not is_dispensed">
-                <field name="medical_record_id" string="Medical Record"/>
-                <field name="patient_id" related="medical_record_id.patient_id" string="Patient"/>
-                <field name="doctor_id" related="medical_record_id.doctor_id" string="Prescribing Doctor"/>
-                <field name="drug_id"/>
-                <field name="qty_prescribed"/>
-                <field name="dosage"/>
-                <field name="frequency"/>
-                <field name="duration"/>
-                <field name="notes" optional="hide"/>
-                <button name="action_dispense_drug" type="object" string="Dispense" icon="fa-check-square-o"/>
-            </tree>
-        </field>
-    </record>
-
-    <!-- Vue Form pour les Prescriptions à Délivrer (lecture seule) -->
-    <record id="view_hms_prescription_to_dispense_form" model="ir.ui.view">
-        <field name="name">hms.prescription.to.dispense.form</field>
-        <field name="model">hms.prescription.line</field>
-        <field name="arch" type="xml">
-            <form string="Prescription Line" create="false" edit="false">
-                <sheet>
-                    <group>
-                        <group>
-                            <field name="medical_record_id"/>
-                            <field name="patient_id" related="medical_record_id.patient_id"/>
-                            <field name="doctor_id" related="medical_record_id.doctor_id"/>
-                            <field name="drug_id"/>
-                        </group>
-                        <group>
-                            <field name="qty_prescribed"/>
-                            <field name="dosage"/>
-                            <field name="frequency"/>
-                            <field name="duration"/>
-                        </group>
-                    </group>
-                    <field name="notes" placeholder="Notes for this drug..."/>
-                    <group string="Dispensation Details" invisible="not is_dispensed">
-                        <field name="is_dispensed"/>
-                        <field name="qty_dispensed"/>
-                        <field name="dispense_date"/>
-                        <field name="dispensed_by_id"/>
-                    </group>
-                    <div class="oe_clear" invisible="is_dispensed == True">
-                        <button name="action_dispense_drug" type="object" string="Mark as Dispensed" class="oe_highlight"/>
-                    </div>
-                </sheet>
-            </form>
+            <p>
+                This view shows prescription lines awaiting dispensing by the pharmacy.
+                Ensure the line is in 'Pending' state to enable dispensing actions.
+            </p>
         </field>
     </record>
 </odoo>

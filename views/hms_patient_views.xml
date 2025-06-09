@@ -13,13 +13,15 @@
                             <field name="patient_id" readonly="1"/>
                         </h1>
                         <h2>
-                            <field name="name" placeholder="Patient's Name" required="1"/>
+                            <field name="name" placeholder="Patient's Full Name" required="1"/>
                         </h2>
+                        <field name="display_name" invisible="1"/>
                     </div>
                     <group>
                         <group string="Personal Information">
                             <field name="date_of_birth"/>
-                            <field name="age_display" string="Age"/>
+                            <field name="age" readonly="1"/>
+                            <field name="age_display" readonly="1"/>
                             <field name="gender"/>
                             <field name="marital_status"/>
                             <field name="occupation"/>
@@ -28,65 +30,45 @@
                             <field name="phone"/>
                             <field name="mobile"/>
                             <field name="email" widget="email"/>
+                            <label for="street" string="Address"/>
+                            <div class="o_address_format">
+                                <field name="street" placeholder="Street..." class="o_address_street"/>
+                                <field name="street2" placeholder="Street 2..." class="o_address_street"/>
+                                <field name="city" placeholder="City" class="o_address_city"/>
+                                <field name="state_id" class="o_address_state" placeholder="State" options='{"no_open": True, "no_create": True}'/>
+                                <field name="zip" placeholder="ZIP" class="o_address_zip"/>
+                                <field name="country_id" placeholder="Country" class="o_address_country" options='{"no_open": True, "no_create": True}'/>
+                            </div>
                         </group>
                     </group>
+                    <group>
+                        <group string="Medical Information">
+                            <field name="blood_group"/>
+                            <field name="allergies" placeholder="e.g., Penicillin, Peanuts"/>
+                            <field name="medical_history" placeholder="Past illnesses, surgeries, etc."/>
+                        </group>
+                        <group string="Emergency Contact">
+                            <field name="emergency_contact_name"/>
+                            <field name="emergency_contact_phone"/>
+                            <field name="emergency_contact_relation"/>
+                        </group>
+                    </group>
+                    <group string="Administrative">
+                         <field name="partner_id" readonly="1" context="{'default_is_patient':True, 'default_customer_rank':1, 'default_name': name, 'default_email': email, 'default_phone': phone}"/>
+                         <button name="action_open_partner_form" type="object" string="View/Edit Partner"
+                                 class="oe_link" icon="fa-arrow-right"
+                                 invisible="not partner_id"/>
+                        <field name="active"/>
+                    </group>
+
                     <notebook>
-                        <page string="Address">
-                            <group>
-                                <group>
-                                    <field name="street"/>
-                                    <field name="street2"/>
-                                    <field name="city"/>
-                                </group>
-                                <group>
-                                    <field name="state_id"/>
-                                    <field name="zip"/>
-                                    <field name="country_id"/>
-                                </group>
-                            </group>
-                        </page>
-                        <page string="Medical Information">
-                            <group>
-                                <field name="blood_group"/>
-                                <field name="allergies"/>
-                                <field name="medical_history"/>
-                            </group>
-                        </page>
-                        <page string="Emergency Contact">
-                            <group>
-                                <field name="emergency_contact_name"/>
-                                <field name="emergency_contact_phone"/>
-                                <field name="emergency_contact_relation"/>
-                            </group>
-                        </page>
-                        <page string="Insurances">
-                            <field name="insurance_ids">
-                                <tree editable="bottom">
-                                    <field name="insurance_company_id" required="1"/>
-                                    <field name="policy_number" required="1"/>
-                                    <field name="coverage_start_date"/>
-                                    <field name="coverage_end_date"/>
-                                    <field name="notes"/>
-                                </tree>
-                                <form>
-                                    <group>
-                                        <field name="insurance_company_id" required="1"/>
-                                        <field name="policy_number" required="1"/>
-                                    </group>
-                                    <group>
-                                        <field name="coverage_start_date"/>
-                                        <field name="coverage_end_date"/>
-                                    </group>
-                                    <field name="notes"/>
-                                </form>
-                            </field>
-                        </page>
                         <page string="Appointments">
                             <field name="appointment_ids" readonly="1">
                                 <tree>
                                     <field name="name"/>
                                     <field name="doctor_id"/>
                                     <field name="appointment_date"/>
+                                    <field name="duration"/>
                                     <field name="state"/>
                                 </tree>
                             </field>
@@ -97,7 +79,19 @@
                                     <field name="name"/>
                                     <field name="doctor_id"/>
                                     <field name="date"/>
+                                    <field name="chief_complaint"/>
                                     <field name="diagnosis"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Insurances">
+                            <field name="insurance_ids" context="{'default_patient_id': active_id}">
+                                <tree editable="bottom">
+                                    <field name="insurance_company_id" required="1"/>
+                                    <field name="policy_number" required="1"/>
+                                    <field name="coverage_start_date"/>
+                                    <field name="coverage_end_date"/>
+                                    <field name="notes"/>
                                 </tree>
                             </field>
                         </page>
@@ -117,16 +111,57 @@
         <field name="name">hms.patient.tree</field>
         <field name="model">hms.patient</field>
         <field name="arch" type="xml">
-            <tree>
+            <tree string="Patients">
                 <field name="patient_id"/>
                 <field name="name"/>
-                <field name="date_of_birth"/>
-                <field name="age_display" string="Age"/>
+                <field name="date_of_birth" optional="hide"/>
+                <field name="age"/>
                 <field name="gender"/>
-                <field name="phone"/>
-                <field name="email"/>
-                <field name="active" invisible="1"/>
+                <field name="phone" optional="show"/>
+                <field name="email" optional="show"/>
+                <field name="city" optional="hide"/>
+                <field name="country_id" optional="hide"/>
+                <field name="active" widget="boolean_toggle"/>
             </tree>
+        </field>
+    </record>
+
+    <!-- Patient Kanban View -->
+    <record id="view_hms_patient_kanban" model="ir.ui.view">
+        <field name="name">hms.patient.kanban</field>
+        <field name="model">hms.patient</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_mobile">
+                <field name="id"/>
+                <field name="name"/>
+                <field name="patient_id"/>
+                <field name="email"/>
+                <field name="phone"/>
+                <field name="gender"/>
+                <field name="age"/>
+                <field name="image"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div t-attf-class="oe_kanban_global_click">
+                            <div class="o_kanban_image">
+                                <img t-att-src="kanban_image('hms.patient', 'image', record.id.raw_value)" alt="Patient Photo" class="oe_avatar"/>
+                            </div>
+                            <div class="oe_kanban_details">
+                                <strong class="o_kanban_record_title"><field name="name"/></strong>
+                                <div class="o_kanban_record_subtitle">
+                                    <field name="patient_id"/>
+                                </div>
+                                <div>
+                                    <t t-if="record.age.raw_value"><field name="age"/> years old</t>
+                                    <t t-if="record.gender.raw_value">, <field name="gender"/></t>
+                                </div>
+                                <div t-if="record.email.raw_value"><i class="fa fa-envelope"/> <field name="email"/></div>
+                                <div t-if="record.phone.raw_value"><i class="fa fa-phone"/> <field name="phone"/></div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
         </field>
     </record>
 
@@ -135,17 +170,23 @@
         <field name="name">hms.patient.search</field>
         <field name="model">hms.patient</field>
         <field name="arch" type="xml">
-            <search>
-                <field name="name"/>
+            <search string="Search Patients">
+                <field name="name" string="Name or ID" filter_domain="['|', ('name','ilike',self), ('patient_id','ilike',self)]"/>
                 <field name="patient_id"/>
                 <field name="phone"/>
                 <field name="email"/>
-                <field name="gender"/>
+                <field name="city"/>
+                <field name="country_id"/>
                 <field name="blood_group"/>
+                <field name="gender"/>
+                <filter string="Male" name="male" domain="[('gender','=','male')]"/>
+                <filter string="Female" name="female" domain="[('gender','=','female')]"/>
+                <separator/>
                 <filter string="Archived" name="inactive" domain="[('active','=',False)]"/>
                 <group expand="0" string="Group By">
                     <filter string="Gender" name="group_gender" domain="[]" context="{'group_by':'gender'}"/>
                     <filter string="Blood Group" name="group_blood_group" domain="[]" context="{'group_by':'blood_group'}"/>
+                    <filter string="Country" name="group_country" domain="[]" context="{'group_by':'country_id'}"/>
                 </group>
             </search>
         </field>
@@ -155,11 +196,14 @@
     <record id="action_hms_patient" model="ir.actions.act_window">
         <field name="name">Patients</field>
         <field name="res_model">hms.patient</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">tree,kanban,form</field>
+        <field name="search_view_id" ref="view_hms_patient_search"/>
         <field name="context">{'search_default_active': 1}</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
-                Create your first patient!
+                Create a new patient record.
+            </p><p>
+                Manage patient information, appointments, and medical history.
             </p>
         </field>
     </record>

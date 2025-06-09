@@ -35,4 +35,22 @@
         <field name="padding">5</field>
         <field name="company_id" eval="False"/>
     </record>
+    <record id="seq_hms_prescription_line" model="ir.sequence">
+        <field name="name">HMS Prescription Line Sequence</field>
+        <field name="code">hms.prescription.line</field>
+        <field name="prefix">PL-</field>
+        <field name="padding">6</field>
+        <field name="company_id" eval="False"/>
+    </record>
+
+    <record id="product_consultation_fee_hms" model="product.product">
+            <field name="name">Doctor Consultation Fee</field>
+            <field name="default_code">CONSULT_FEE_HMS</field>
+            <field name="type">service</field>
+            <field name="categ_id" ref="product.product_category_all"/>
+            <field name="lst_price">0.0</field> <!-- Actual fee from doctor record -->
+            <field name="invoice_policy">order</field>
+            <!-- Ensure an income account is set on this product or its category -->
+            <!-- Example: <field name="property_account_income_id" ref="your_chart_of_accounts.your_income_account_id"/> -->
+    </record>
 </odoo>

@@ -1,4 +1,4 @@
-from odoo import models, fields, api
+from odoo import models, fields, api, _
 from datetime import date
 from dateutil.relativedelta import relativedelta
 
@@ -63,13 +63,19 @@ class HmsPatient(models.Model):
     medical_record_ids = fields.One2many('hms.medical.record', 'patient_id', string='Medical Records')
     insurance_ids = fields.One2many('hms.patient.insurance', 'patient_id', string='Insurances')
 
+    # Billing
+    partner_id = fields.Many2one('res.partner', string='Related Partner', ondelete='restrict',
+                                 help="Partner record for billing and other communications.",
+                                 copy=False)
+
     # Status
     active = fields.Boolean(string='Active', default=True)
 
     @api.depends('name', 'patient_id')
     def _compute_display_name(self):
         for patient in self:
-            patient.display_name = f"[{patient.patient_id}] {patient.name}"
+            patient_id_str = patient.patient_id or 'N/A'
+            patient.display_name = f"[{patient_id_str}] {patient.name or ''}"
 
     @api.depends('date_of_birth')
     def _compute_age(self):
@@ -94,3 +100,62 @@ class HmsPatient(models.Model):
                 patient.age_display = f"{years} years, {months} months, {days} days"
             else:
                 patient.age_display = False
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        patients = super().create(vals_list)
+        for patient in patients:
+            if not patient.partner_id:
+                partner_vals = patient._prepare_partner_values()
+                partner = self.env['res.partner'].create(partner_vals)
+                patient.partner_id = partner.id
+        return patients
+
+    def write(self, vals):
+        res = super().write(vals)
+        for patient in self:
+            if patient.partner_id and any(key in vals for key in
+                                          ['name', 'email', 'phone', 'mobile', 'street', 'street2', 'city', 'state_id',
+                                           'zip', 'country_id']):
+                partner_vals_to_update = patient._prepare_partner_values()
+                # Avoid changing partner name if it was manually set to something different
+                if 'name' in partner_vals_to_update and patient.partner_id.name != patient.name and patient.partner_id.name != vals.get(
+                        'name'):
+                    del partner_vals_to_update['name']  # Don't overwrite if partner name is customized
+
+                if partner_vals_to_update:
+                    patient.partner_id.write(partner_vals_to_update)
+        return res
+
+    def _prepare_partner_values(self):
+        self.ensure_one()
+        return {
+            'name': self.name,
+            'email': self.email,
+            'phone': self.phone,
+            'mobile': self.mobile,
+            'street': self.street,
+            'street2': self.street2,
+            'city': self.city,
+            'state_id': self.state_id.id if self.state_id else False,
+            'zip': self.zip,
+            'country_id': self.country_id.id if self.country_id else False,
+            'customer_rank': 1,
+            # 'is_patient': True, # If you add a custom field to res.partner
+        }
+
+    def action_open_partner_form(self):
+        self.ensure_one()
+        if not self.partner_id:
+            # Create partner if it somehow wasn't created
+            partner_vals = self._prepare_partner_values()
+            partner = self.env['res.partner'].create(partner_vals)
+            self.partner_id = partner.id
+
+        return {
+            'type': 'ir.actions.act_window',
+            'res_model': 'res.partner',
+            'view_mode': 'form',
+            'res_id': self.partner_id.id,
+            'target': 'current',
+        }

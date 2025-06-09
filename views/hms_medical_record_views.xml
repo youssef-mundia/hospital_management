@@ -1,38 +1,141 @@
-<page string="Prescription">
+<odoo>
+    <!-- Medical Record Form View -->
+    <record id="view_hms_medical_record_form" model="ir.ui.view">
+        <field name="name">hms.medical.record.form</field>
+        <field name="model">hms.medical.record</field>
+        <field name="arch" type="xml">
+            <form string="Medical Record">
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group string="Main Information">
+                            <field name="patient_id" required="1" options="{'no_create_edit': True}"/>
+                            <field name="doctor_id" required="1" options="{'no_create_edit': True}"/>
+                            <field name="appointment_id" options="{'no_create_edit': True}"/>
+                            <field name="date" required="1"/>
+                        </group>
+                        <group string="Vital Signs">
+                            <field name="temperature"/>
+                            <label for="blood_pressure_systolic" string="Blood Pressure"/>
+                            <div>
+                                <field name="blood_pressure_systolic" class="oe_inline" placeholder="Systolic"/> /
+                                <field name="blood_pressure_diastolic" class="oe_inline" placeholder="Diastolic"/> mmHg
+                            </div>
+                            <field name="heart_rate"/>
+                            <field name="weight"/>
+                            <field name="height"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Clinical Details">
+                            <group>
+                                <field name="chief_complaint"/>
+                                <field name="symptoms"/>
+                                <field name="diagnosis"/>
+                                <field name="treatment"/>
+                                <field name="recommendations"/>
+                            </group>
+                        </page>
+                        <page string="Prescriptions">
+                            <field name="prescription_notes" placeholder="General notes about the prescription..."/>
                             <field name="prescription_line_ids">
                                 <tree editable="bottom">
-                                    <field name="drug_id" required="1" options="{'no_create_edit': True}"/>
+                                    <field name="product_id" required="1" domain="[('is_medicine', '=', True), ('type', 'in', ['product', 'consu'])]"/>
                                     <field name="qty_prescribed"/>
                                     <field name="dosage"/>
                                     <field name="frequency"/>
                                     <field name="duration"/>
                                     <field name="notes"/>
-                                    <field name="is_dispensed" readonly="1" optional="show"/>
-                                    <field name="qty_dispensed" readonly="1" optional="show" invisible="not is_dispensed"/>
-                                    <field name="dispense_date" readonly="1" optional="show" invisible="not is_dispensed"/>
-                                    <button name="action_dispense_drug" type="object" string="Dispense"
-                                            icon="fa-check-square-o"
-                                            invisible="is_dispensed == True"
-                                            help="Mark this drug as dispensed"/>
                                 </tree>
                                 <form>
-                                    <group>
-                                        <field name="drug_id" required="1" options="{'no_create_edit': True}"/>
-                                        <field name="qty_prescribed"/>
-                                        <field name="dosage"/>
-                                        <field name="frequency"/>
-                                        <field name="duration"/>
-                                        <field name="notes" nolabel="1" placeholder="Additional notes for this drug..."/>
+                                     <group>
+                                        <group>
+                                            <field name="product_id" required="1" domain="[('is_medicine', '=', True), ('type', 'in', ['product', 'consu'])]"/>
+                                            <field name="qty_prescribed"/>
+                                            <field name="dosage"/>
+                                        </group>
+                                        <group>
+                                            <field name="frequency"/>
+                                            <field name="duration"/>
+                                        </group>
                                     </group>
-                                    <group string="Dispensation Details" invisible="not is_dispensed">
-                                        <field name="is_dispensed" readonly="1"/>
-                                        <field name="qty_dispensed" readonly="1"/>
-                                        <field name="dispense_date" readonly="1"/>
-                                        <field name="dispensed_by_id" readonly="1"/>
-                                    </group>
+                                    <field name="notes" placeholder="Specific notes for this drug..."/>
                                 </form>
                             </field>
+                        </page>
+                        <page string="Follow-up">
                             <group>
-                                <field name="prescription_notes" placeholder="General notes about the prescription..."/>
+                                <field name="follow_up_required"/>
+                                <field name="follow_up_date" invisible="not follow_up_required"/>
                             </group>
                         </page>
+                        <page string="Attachments">
+                            <field name="attachment_ids" widget="many2many_binary"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- Medical Record Tree View -->
+    <record id="view_hms_medical_record_tree" model="ir.ui.view">
+        <field name="name">hms.medical.record.tree</field>
+        <field name="model">hms.medical.record</field>
+        <field name="arch" type="xml">
+            <tree string="Medical Records">
+                <field name="name"/>
+                <field name="patient_id"/>
+                <field name="doctor_id"/>
+                <field name="date"/>
+                <field name="diagnosis" optional="hide"/>
+                <field name="chief_complaint" optional="show"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Medical Record Search View -->
+    <record id="view_hms_medical_record_search" model="ir.ui.view">
+        <field name="name">hms.medical.record.search</field>
+        <field name="model">hms.medical.record</field>
+        <field name="arch" type="xml">
+            <search string="Search Medical Records">
+                <field name="name"/>
+                <field name="patient_id"/>
+                <field name="doctor_id"/>
+                <field name="date"/>
+                <field name="diagnosis"/>
+                <field name="chief_complaint"/>
+                <filter string="Requires Follow-up" name="follow_up_required" domain="[('follow_up_required', '=', True)]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Patient" name="group_patient" domain="[]" context="{'group_by':'patient_id'}"/>
+                    <filter string="Doctor" name="group_doctor" domain="[]" context="{'group_by':'doctor_id'}"/>
+                    <filter string="Record Date" name="group_date" domain="[]" context="{'group_by':'date:day'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Medical Record Action -->
+    <record id="action_hms_medical_record" model="ir.actions.act_window">
+        <field name="name">Medical Records</field>
+        <field name="res_model">hms.medical.record</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create a new medical record.
+            </p><p>
+                Medical records store patient visit details, diagnosis, and treatment plans.
+            </p>
+        </field>
+    </record>
+</odoo>

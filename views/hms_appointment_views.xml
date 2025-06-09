@@ -11,12 +11,19 @@
                             invisible="state != 'draft'"/>
                     <button name="action_start" string="Start Appointment" type="object" class="oe_highlight"
                             invisible="state != 'confirmed'"/>
-                    <button name="action_complete" string="Mark as Completed" type="object" class="oe_highlight"
+                    <button name="action_complete" string="Mark as Completed" type="object" class.="oe_highlight"
                             invisible="state != 'in_progress'"/>
+                    <button name="action_create_invoice" string="Create/Update Invoice" type="object"
+                            invisible="state != 'completed' or (invoice_id and invoice_id.state != 'draft' and invoice_id.payment_state == 'paid')"/>
+                    <button name="action_view_invoice" string="View Invoice" type="object"
+                            invisible="not invoice_id"/>
                     <button name="action_cancel" string="Cancel" type="object"
                             invisible="state in ('completed', 'cancelled')"
                             confirm="Are you sure you want to cancel this appointment?"/>
                     <field name="state" widget="statusbar" statusbar_visible="draft,confirmed,in_progress,completed"/>
+                    <field name="invoice_id" invisible="1"/>
+                    <field name="invoice_status" widget="statusbar" statusbar_colors='{"not_paid":"red","in_payment":"orange","paid":"green","partial":"blue"}'
+                           invisible="not invoice_id or state == 'cancelled'"/>
                 </header>
                 <sheet>
                     <div class="oe_title">
@@ -39,6 +46,12 @@
                             <field name="appointment_date_day_code" invisible="1"/>
                             <field name="duration"/>
                             <field name="end_datetime" readonly="1"/>
+                        </group>
+                        <group>
+                            <group string="Billing Information" name="billing_info" invisible="not invoice_id">
+                             <field name="invoice_id" readonly="1"/>
+                             <field name="invoice_status" string="Payment Status"/>
+                            </group>
                         </group>
                     </group>
                     <notebook>
