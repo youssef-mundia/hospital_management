@@ -22,3 +22,6 @@ access_hms_day_of_week_manager,hms.day.of.week.manager,model_hms_day_of_week,gro
 access_hms_prescription_line_user,hms.prescription.line.user,model_hms_prescription_line,group_hms_user,1,0,0,0
 access_hms_prescription_line_doctor,hms.prescription.line.doctor,model_hms_prescription_line,group_hms_doctor,1,1,1,0
 access_hms_prescription_line_manager,hms.prescription.line.manager,model_hms_prescription_line,group_hms_manager,1,1,1,1
+access_hms_dashboard_user,hms.dashboard.user,model_hms_dashboard,group_hms_user,1,1,1,0
+access_hms_dashboard_doctor,hms.dashboard.doctor,model_hms_dashboard,group_hms_doctor,1,1,1,0
+access_hms_dashboard_manager,hms.dashboard.manager,model_hms_dashboard,group_hms_manager,1,1,1,1

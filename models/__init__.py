@@ -8,3 +8,4 @@ from . import hms_day_of_week
 from . import hms_prescription_line
 from . import product_template
 from . import product_product
+from . import hms_dashboard

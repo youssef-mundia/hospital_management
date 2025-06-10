@@ -1,0 +1,341 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_hms_dashboard_form" model="ir.ui.view">
+        <field name="name">hms.dashboard.form</field>
+        <field name="model">hms.dashboard</field>
+        <field name="arch" type="xml">
+            <form string="Hospital Management Dashboard" create="false" edit="false" delete="false">
+                <header>
+                    <button name="refresh_dashboard" string="Refresh Data" type="object" class="btn-primary"/>
+                </header>
+                <sheet>
+                    <div class="container-fluid">
+                        <div class="row mb-4">
+                            <div class="col-12 text-center">
+                                <h1 class="text-primary mb-2">
+                                    <i class="fa fa-tachometer-alt me-2"></i>
+                                    Hospital Management Dashboard
+                                </h1>
+                                <p class="text-muted fs-5">Hospital Operations Overview</p>
+                            </div>
+                        </div>
+
+                        <div class="row mb-4 g-3">
+                            <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6">
+                                <div class="card border-primary text-center h-100 shadow-sm">
+                                    <div class="card-body p-3">
+                                        <i class="fa fa-users fa-2x text-primary mb-3"></i>
+                                        <h3 class="text-primary mb-2">
+                                            <field name="total_patients"/>
+                                        </h3>
+                                        <small class="text-muted d-block mb-2">Total Patients</small>
+                                        <span class="badge bg-success">
+                                            +<field name="new_patients_month"/> this month
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6">
+                                <div class="card border-success text-center h-100 shadow-sm">
+                                    <div class="card-body p-3">
+                                        <i class="fa fa-user-md fa-2x text-success mb-3"></i>
+                                        <h3 class="text-success mb-2">
+                                            <field name="total_doctors"/>
+                                        </h3>
+                                        <small class="text-muted">Active Doctors</small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6">
+                                <div class="card border-info text-center h-100 shadow-sm">
+                                    <div class="card-body p-3">
+                                        <i class="fa fa-calendar fa-2x text-info mb-3"></i>
+                                        <h3 class="text-info mb-2">
+                                            <field name="today_appointments"/>
+                                        </h3>
+                                        <small class="text-muted">Today's Appointments</small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6">
+                                <div class="card border-warning text-center h-100 shadow-sm">
+                                    <div class="card-body p-3">
+                                        <i class="fa fa-file-text fa-2x text-warning mb-3"></i>
+                                        <h3 class="text-warning mb-2">
+                                            <field name="pending_prescriptions"/>
+                                        </h3>
+                                        <small class="text-muted">Pending Prescriptions</small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6">
+                                <div class="card border-success text-center h-100 shadow-sm">
+                                    <div class="card-body p-3">
+                                        <i class="fa fa-money fa-2x text-success mb-3"></i>
+                                        <h3 class="text-success mb-2">
+                                            €<field name="monthly_revenue"/>
+                                        </h3>
+                                        <small class="text-muted">Monthly Revenue</small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6">
+                                <div class="card border-primary text-center h-100 shadow-sm">
+                                    <div class="card-body p-3">
+                                        <i class="fa fa-check-circle fa-2x text-primary mb-3"></i>
+                                        <h3 class="text-primary mb-2">
+                                            <field name="completion_rate"/>%
+                                        </h3>
+                                        <small class="text-muted">Completion Rate</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-12">
+                                <h3 class="text-dark">
+                                    <i class="fa fa-cogs me-2"></i>
+                                    Quick Actions
+                                </h3>
+                                <hr class="mb-0"/>
+                            </div>
+                        </div>
+
+                        <div class="row mb-4 g-4">
+                            <div class="col-lg-4 col-md-6">
+                                <div class="card shadow h-100 border-0">
+                                    <div class="card-body text-center p-4">
+                                        <div class="display-4 text-primary mb-3">
+                                            <i class="fa fa-users"></i>
+                                        </div>
+                                        <h5 class="card-title mb-3">Patient Management</h5>
+                                        <div class="row text-muted small mb-3">
+                                            <div class="col-6">
+                                                <span class="text-muted">Total:</span>
+                                                <br/>
+                                                <strong class="text-primary"><field name="total_patients"/></strong>
+                                            </div>
+                                            <div class="col-6">
+                                                <span class="text-muted">New:</span>
+                                                <br/>
+                                                <strong class="text-success"><field name="new_patients_month"/></strong>
+                                            </div>
+                                        </div>
+                                        <button name="%(action_hms_patient)d" type="action"
+                                                string="Manage Patients"
+                                                class="btn btn-primary btn-sm px-4"/>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-4 col-md-6">
+                                <div class="card shadow h-100 border-0">
+                                    <div class="card-body text-center p-4">
+                                        <div class="display-4 text-success mb-3">
+                                            <i class="fa fa-user-md"></i>
+                                        </div>
+                                        <h5 class="card-title mb-3">Doctor Management</h5>
+                                        <div class="row text-muted small mb-3">
+                                            <div class="col-6">
+                                                <span class="text-muted">Active:</span>
+                                                <br/>
+                                                <strong class="text-success"><field name="total_doctors"/></strong>
+                                            </div>
+                                            <div class="col-6">
+                                                <span class="text-muted">Departments:</span>
+                                                <br/>
+                                                <strong class="text-info"><field name="department_count"/></strong>
+                                            </div>
+                                        </div>
+                                        <button name="%(action_hms_doctor)d" type="action"
+                                                string="Manage Doctors"
+                                                class="btn btn-success btn-sm px-4"/>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-4 col-md-6">
+                                <div class="card shadow h-100 border-0">
+                                    <div class="card-body text-center p-4">
+                                        <div class="display-4 text-info mb-3">
+                                            <i class="fa fa-calendar"></i>
+                                        </div>
+                                        <h5 class="card-title mb-3">Appointment Management</h5>
+                                        <div class="row text-muted small mb-3">
+                                            <div class="col-6">
+                                                <span class="text-muted">Today:</span>
+                                                <br/>
+                                                <strong class="text-info"><field name="today_appointments"/></strong>
+                                            </div>
+                                            <div class="col-6">
+                                                <span class="text-muted">Month:</span>
+                                                <br/>
+                                                <strong class="text-warning"><field name="month_appointments"/></strong>
+                                            </div>
+                                        </div>
+                                        <button name="%(action_hms_appointment)d" type="action"
+                                                string="Manage Appointments"
+                                                class="btn btn-info btn-sm px-4"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mb-4 g-4">
+                            <div class="col-lg-4 col-md-6">
+                                <div class="card shadow h-100 border-0">
+                                    <div class="card-body text-center p-4">
+                                        <div class="display-4 text-warning mb-3">
+                                            <i class="fa fa-folder-open"></i>
+                                        </div>
+                                        <h5 class="card-title mb-3">Medical Records</h5>
+                                        <div class="row text-muted small mb-3">
+                                            <div class="col-6">
+                                                <span class="text-muted">This Month:</span>
+                                                <br/>
+                                                <strong class="text-warning"><field name="medical_records_month"/></strong>
+                                            </div>
+                                            <div class="col-6">
+                                                <span class="text-muted">Follow-up:</span>
+                                                <br/>
+                                                <strong class="text-danger"><field name="follow_up_required"/></strong>
+                                            </div>
+                                        </div>
+                                        <button name="%(action_hms_medical_record)d" type="action"
+                                                string="View Records"
+                                                class="btn btn-warning btn-sm px-4"/>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-4 col-md-6">
+                                <div class="card shadow h-100 border-0">
+                                    <div class="card-body text-center p-4">
+                                        <div class="display-4 text-danger mb-3">
+                                            <i class="fa fa-building"></i>
+                                        </div>
+                                        <h5 class="card-title mb-3">Department Management</h5>
+                                        <div class="row text-muted small mb-3">
+                                            <div class="col-12">
+                                                <span class="text-muted">Total Departments:</span>
+                                                <br/>
+                                                <strong class="text-danger fs-5"><field name="department_count"/></strong>
+                                            </div>
+                                        </div>
+                                        <button name="%(action_hms_department)d" type="action"
+                                                string="Manage Departments"
+                                                class="btn btn-danger btn-sm px-4"/>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-4 col-md-6">
+                                <div class="card shadow h-100 border-0">
+                                    <div class="card-body text-center p-4">
+                                        <div class="display-4 text-secondary mb-3">
+                                            <i class="fa fa-medkit"></i>
+                                        </div>
+                                        <h5 class="card-title mb-3">Pharmacy Management</h5>
+                                        <div class="row text-muted small mb-3">
+                                            <div class="col-6">
+                                                <span class="text-muted">Pending:</span>
+                                                <br/>
+                                                <strong class="text-warning"><field name="pending_prescriptions"/></strong>
+                                            </div>
+                                            <div class="col-6">
+                                                <span class="text-muted">Rate:</span>
+                                                <br/>
+                                                <strong class="text-success"><field name="dispensing_rate"/>%</strong>
+                                            </div>
+                                        </div>
+                                        <button name="%(action_hms_prescription_line_pharmacy)d" type="action"
+                                                string="Manage Pharmacy"
+                                                class="btn btn-secondary btn-sm px-4"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="card shadow border-0">
+                                    <div class="card-header bg-gradient-info text-white">
+                                        <h5 class="mb-0">
+                                            <i class="fa fa-chart-bar me-2"></i>
+                                            Hospital Statistics Summary
+                                        </h5>
+                                    </div>
+                                    <div class="card-body p-4">
+                                        <div class="row g-4">
+                                            <div class="col-lg-3 col-md-6 text-center">
+                                                <div class="border-end">
+                                                    <h6 class="text-primary mb-3">
+                                                        <i class="fa fa-users me-2"></i>
+                                                        Patient Statistics
+                                                    </h6>
+                                                    <p class="mb-2">Total Active: <strong class="text-primary"><field name="total_patients"/></strong></p>
+                                                    <p class="mb-0">New This Month: <strong class="text-success"><field name="new_patients_month"/></strong></p>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-3 col-md-6 text-center">
+                                                <div class="border-end">
+                                                    <h6 class="text-info mb-3">
+                                                        <i class="fa fa-calendar me-2"></i>
+                                                        Appointment Statistics
+                                                    </h6>
+                                                    <p class="mb-2">Today: <strong class="text-info"><field name="today_appointments"/></strong></p>
+                                                    <p class="mb-2">This Month: <strong class="text-warning"><field name="month_appointments"/></strong></p>
+                                                    <p class="mb-0">Completion Rate: <strong class="text-success"><field name="completion_rate"/>%</strong></p>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-3 col-md-6 text-center">
+                                                <div class="border-end">
+                                                    <h6 class="text-warning mb-3">
+                                                        <i class="fa fa-folder-open me-2"></i>
+                                                        Medical Records
+                                                    </h6>
+                                                    <p class="mb-2">This Month: <strong class="text-warning"><field name="medical_records_month"/></strong></p>
+                                                    <p class="mb-0">Follow-up Required: <strong class="text-danger"><field name="follow_up_required"/></strong></p>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-3 col-md-6 text-center">
+                                                <h6 class="text-success mb-3">
+                                                    <i class="fa fa-money me-2"></i>
+                                                    Financial
+                                                </h6>
+                                                <p class="mb-2">Monthly Revenue: <strong class="text-success">€<field name="monthly_revenue"/></strong></p>
+                                                <p class="mb-0">Pharmacy Rate: <strong class="text-info"><field name="dispensing_rate"/>%</strong></p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Dashboard Action -->
+    <record id="action_hms_dashboard" model="ir.actions.act_window">
+        <field name="name">Hospital Dashboard</field>
+        <field name="res_model">hms.dashboard</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_hms_dashboard_form"/>
+        <field name="target">main</field>
+    </record>
+
+    <!-- Dashboard Menu -->
+    <menuitem id="menu_hms_dashboard"
+              name="Dashboard"
+              parent="menu_hms_root"
+              action="action_hms_dashboard"
+              sequence="1"/>
+</odoo>

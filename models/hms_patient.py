@@ -149,3 +149,4 @@ class HmsPatient(models.Model):
             'res_id': self.partner_id.id,
             'target': 'current',
         }
+

@@ -9,7 +9,7 @@
     'author': 'Youssef Mundia',
     'website': 'https://www.example.com',
     'category': 'Services/Healthcare',
-    'depends': ['base', 'mail', 'contacts', 'product', 'stock','account','sale'], # Ajout de 'stock'
+    'depends': ['base', 'mail', 'contacts', 'product', 'stock','account','sale','board','web'],
     'data': [
         'security/hms_security.xml',
         'security/ir.model.access.csv',
@@ -24,6 +24,7 @@
         'views/product_template_views.xml',
         'views/hms_pharmacy_views.xml',
         'views/hms_menus.xml',
+        'views/hms_dashboard_views.xml',
         'demo/hms_demo.xml',
     ],
     'demo': [
