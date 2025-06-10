@@ -13,31 +13,24 @@ class HmsDoctor(models.Model):
 
     image = fields.Image(string="Photo")
 
-    # Professional Information
     specialization = fields.Char(string='Specialization', tracking=True)
     license_number = fields.Char(string='License Number', tracking=True)
     experience_years = fields.Integer(string='Experience (Years)', tracking=True)
     qualification = fields.Text(string='Qualification')
 
-    # Contact Information
     phone = fields.Char(string='Phone', tracking=True)
     mobile = fields.Char(string='Mobile', tracking=True)
     email = fields.Char(string='Email', tracking=True)
 
-    # Department
     department_id = fields.Many2one('hms.department', string='Department', tracking=True)
 
-    # Schedule
     consultation_fee = fields.Float(string='Consultation Fee')
 
-    # Nouveau champ Many2many (l'original que vous voulez garder)
     available_days = fields.Many2many('hms.day.of.week', string='Available Days')
 
-    # Relations
     appointment_ids = fields.One2many('hms.appointment', 'doctor_id', string='Appointments')
     user_id = fields.Many2one('res.users', string='Related User', tracking=True)
 
-    # Status
     active = fields.Boolean(string='Active', default=True, tracking=True)
 
     @api.depends('name', 'doctor_id')

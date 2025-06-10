@@ -50,7 +50,5 @@
             <field name="categ_id" ref="product.product_category_all"/>
             <field name="lst_price">0.0</field> <!-- Actual fee from doctor record -->
             <field name="invoice_policy">order</field>
-            <!-- Ensure an income account is set on this product or its category -->
-            <!-- Example: <field name="property_account_income_id" ref="your_chart_of_accounts.your_income_account_id"/> -->
     </record>
 </odoo>

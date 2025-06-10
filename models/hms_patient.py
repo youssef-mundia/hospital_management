@@ -14,7 +14,6 @@ class HmsPatient(models.Model):
                              default=lambda self: self.env['ir.sequence'].next_by_code('hms.patient'))
     display_name = fields.Char(string='Display Name', compute='_compute_display_name', store=True)
 
-    # Personal Information
     date_of_birth = fields.Date(string='Date of Birth', tracking=True)
     age = fields.Integer(string='Age (Years)', compute='_compute_age', store=True, tracking=True)
     age_display = fields.Char(string='Precise Age', compute='_compute_age_display', store=True)
@@ -32,7 +31,6 @@ class HmsPatient(models.Model):
     ], string='Marital Status', tracking=True)
     occupation = fields.Char(string='Occupation', tracking=True)
 
-    # Contact Information
     phone = fields.Char(string='Phone', tracking=True)
     mobile = fields.Char(string='Mobile', tracking=True)
     email = fields.Char(string='Email', tracking=True)
@@ -43,7 +41,6 @@ class HmsPatient(models.Model):
     zip = fields.Char(string='ZIP')
     country_id = fields.Many2one('res.country', string='Country')
 
-    # Medical Information
     blood_group = fields.Selection([
         ('A+', 'A+'), ('A-', 'A-'),
         ('B+', 'B+'), ('B-', 'B-'),
@@ -53,22 +50,18 @@ class HmsPatient(models.Model):
     allergies = fields.Text(string='Allergies')
     medical_history = fields.Text(string='Medical History')
 
-    # Emergency Contact
     emergency_contact_name = fields.Char(string='Emergency Contact Name')
     emergency_contact_phone = fields.Char(string='Emergency Contact Phone')
     emergency_contact_relation = fields.Char(string='Relation')
 
-    # Relations
     appointment_ids = fields.One2many('hms.appointment', 'patient_id', string='Appointments')
     medical_record_ids = fields.One2many('hms.medical.record', 'patient_id', string='Medical Records')
     insurance_ids = fields.One2many('hms.patient.insurance', 'patient_id', string='Insurances')
 
-    # Billing
     partner_id = fields.Many2one('res.partner', string='Related Partner', ondelete='restrict',
                                  help="Partner record for billing and other communications.",
                                  copy=False)
 
-    # Status
     active = fields.Boolean(string='Active', default=True)
 
     @api.depends('name', 'patient_id')
@@ -118,10 +111,9 @@ class HmsPatient(models.Model):
                                           ['name', 'email', 'phone', 'mobile', 'street', 'street2', 'city', 'state_id',
                                            'zip', 'country_id']):
                 partner_vals_to_update = patient._prepare_partner_values()
-                # Avoid changing partner name if it was manually set to something different
                 if 'name' in partner_vals_to_update and patient.partner_id.name != patient.name and patient.partner_id.name != vals.get(
                         'name'):
-                    del partner_vals_to_update['name']  # Don't overwrite if partner name is customized
+                    del partner_vals_to_update['name']
 
                 if partner_vals_to_update:
                     patient.partner_id.write(partner_vals_to_update)
@@ -141,13 +133,11 @@ class HmsPatient(models.Model):
             'zip': self.zip,
             'country_id': self.country_id.id if self.country_id else False,
             'customer_rank': 1,
-            # 'is_patient': True, # If you add a custom field to res.partner
         }
 
     def action_open_partner_form(self):
         self.ensure_one()
         if not self.partner_id:
-            # Create partner if it somehow wasn't created
             partner_vals = self._prepare_partner_values()
             partner = self.env['res.partner'].create(partner_vals)
             self.partner_id = partner.id

@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!-- Appointment Form View -->
     <record id="view_hms_appointment_form" model="ir.ui.view">
         <field name="name">hms.appointment.form</field>
         <field name="model">hms.appointment</field>
@@ -82,7 +81,6 @@
         </field>
     </record>
 
-    <!-- Appointment Tree View -->
     <record id="view_hms_appointment_tree" model="ir.ui.view">
         <field name="name">hms.appointment.tree</field>
         <field name="model">hms.appointment</field>
@@ -101,7 +99,6 @@
         </field>
     </record>
 
-    <!-- Appointment Search View -->
     <record id="view_hms_appointment_search" model="ir.ui.view">
         <field name="name">hms.appointment.search</field>
         <field name="model">hms.appointment</field>
@@ -132,7 +129,6 @@
         </field>
     </record>
 
-    <!-- Appointment Kanban View -->
     <record id="view_hms_appointment_kanban" model="ir.ui.view">
         <field name="name">hms.appointment.kanban</field>
         <field name="model">hms.appointment</field>
@@ -174,7 +170,6 @@
         </field>
     </record>
 
-    <!-- Appointment Calendar View -->
     <record id="view_hms_appointment_calendar" model="ir.ui.view">
         <field name="name">hms.appointment.calendar</field>
         <field name="model">hms.appointment</field>
@@ -192,7 +187,6 @@
         </field>
     </record>
 
-    <!-- Appointment Action -->
     <record id="action_hms_appointment" model="ir.actions.act_window">
         <field name="name">Appointments</field>
         <field name="res_model">hms.appointment</field>

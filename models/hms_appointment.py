@@ -47,7 +47,6 @@ class HmsAppointment(models.Model):
     medical_record_ids = fields.One2many('hms.medical.record', 'appointment_id', string='Medical Records')
     medical_record_count = fields.Integer(compute='_compute_medical_record_count', string="Medical Records Count")
 
-    # Billing
     invoice_id = fields.Many2one('account.move', string='Invoice', copy=False, readonly=True)
     invoice_status = fields.Selection(related='invoice_id.payment_state', string="Invoice Status", readonly=True,
                                       store=True)
@@ -66,7 +65,7 @@ class HmsAppointment(models.Model):
             if record.appointment_date and record.duration > 0:
                 record.end_datetime = record.appointment_date + timedelta(hours=record.duration)
             else:
-                record.end_datetime = record.appointment_date  # Or False if duration is mandatory
+                record.end_datetime = record.appointment_date
 
     @api.depends('medical_record_ids')
     def _compute_medical_record_count(self):
@@ -77,9 +76,8 @@ class HmsAppointment(models.Model):
     def _check_doctor_availability_and_overlapping_appointments(self):
         for record in self:
             if not record.appointment_date or not record.doctor_id or not record.duration > 0:
-                continue  # Validation handled by required fields or other constraints
+                continue
 
-            # Check doctor's available days
             appointment_day_code = record.appointment_date.strftime('%A').lower()
             if appointment_day_code not in record.doctor_id.available_days.mapped('code'):
                 available_days_str = ", ".join(d.name for d in record.doctor_id.available_days)
@@ -89,7 +87,6 @@ class HmsAppointment(models.Model):
                      available_days_str or _("None specified"))
                 )
 
-            # Check for overlapping appointments for the same doctor
             start_time = record.appointment_date
             end_time = record.end_datetime
 
@@ -97,8 +94,6 @@ class HmsAppointment(models.Model):
                 ('id', '!=', record.id),
                 ('doctor_id', '=', record.doctor_id.id),
                 ('state', 'not in', ['cancelled']),
-                # Overlap condition:
-                # (ExistingStart < NewEnd) and (ExistingEnd > NewStart)
                 ('appointment_date', '<', end_time),
                 ('end_datetime', '>', start_time),
             ])
@@ -226,13 +221,12 @@ class HmsAppointment(models.Model):
                 subject=_("Appointment Completed: %s") % record.name
             )
 
-            # Create medical record if not already linked to one from this appointment
             if not record.medical_record_ids.filtered(lambda mr: mr.appointment_id == record):
                 medical_record_vals = {
                     'patient_id': record.patient_id.id,
                     'doctor_id': record.doctor_id.id,
                     'appointment_id': record.id,
-                    'date': record.appointment_date,  # Or fields.Datetime.now() if preferred
+                    'date': record.appointment_date,
                     'chief_complaint': record.reason or _('Follow-up/Consultation from appointment %s') % record.name,
                 }
                 medical_record = self.env['hms.medical.record'].create(medical_record_vals)
@@ -243,15 +237,14 @@ class HmsAppointment(models.Model):
                     subject=_("Medical Record Created for Appointment %s") % record.name
                 )
 
-            # Attempt to create/update invoice
             if record.doctor_id and record.doctor_id.consultation_fee > 0 or (
                     record.invoice_id and record.invoice_id.state == 'draft'):
                 try:
                     record.action_create_invoice()
                 except UserError as e:
                     record.message_post(body=_("Appointment completed. Invoice processing issue: %s") % str(e))
-                except Exception as e:  # Catch any other unexpected error
-                    self.env.cr.rollback()  # Rollback transaction to avoid partial data
+                except Exception as e:
+                    self.env.cr.rollback()
                     raise UserError(
                         _("An unexpected error occurred during invoice creation for appointment %s: %s. Please try again or contact support.") % (
                             record.name, str(e)))
@@ -269,9 +262,8 @@ class HmsAppointment(models.Model):
                     _("Cannot cancel appointment %s as it has a processed invoice (%s). Please cancel the invoice first.") % (
                         record.name, record.invoice_id.name))
 
-            # Cancel related draft invoice
             if record.invoice_id and record.invoice_id.state == 'draft':
-                record.invoice_id.button_cancel()  # Or button_draft then button_cancel if needed
+                record.invoice_id.button_cancel()
                 record.message_post(body=_(
                     "Draft invoice %s associated with the appointment has been cancelled.") % record.invoice_id.name)
 

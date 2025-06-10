@@ -38,13 +38,11 @@ class HmsPrescriptionLine(models.Model):
     invoice_id = fields.Many2one('account.move', string='Invoice', copy=False, readonly=True)
     invoice_line_id = fields.Many2one('account.move.line', string='Invoice Line', copy=False, readonly=True)
 
-    # Stock movement tracking
     stock_move_id = fields.Many2one('stock.move', string='Stock Move', copy=False, readonly=True)
     picking_id = fields.Many2one('stock.picking', string='Delivery Order', copy=False, readonly=True)
 
     def _get_pharmacy_location(self):
         """Get the pharmacy/dispensary location"""
-        # First try to find a pharmacy-specific location
         pharmacy_location = self.env['stock.location'].search([
             ('usage', '=', 'internal'),
             '|',
@@ -53,7 +51,6 @@ class HmsPrescriptionLine(models.Model):
         ], limit=1)
 
         if not pharmacy_location:
-            # Fallback to any internal location
             pharmacy_location = self.env['stock.location'].search([
                 ('usage', '=', 'internal')
             ], limit=1)
@@ -80,7 +77,7 @@ class HmsPrescriptionLine(models.Model):
         """Check if there's enough stock available"""
         self.ensure_one()
         if self.product_id.type not in ['product']:
-            return True  # Consumable products don't require stock check
+            return True
 
         pharmacy_location = self._get_pharmacy_location()
         available_qty = self.product_id.with_context(location=pharmacy_location.id).qty_available
@@ -97,15 +94,13 @@ class HmsPrescriptionLine(models.Model):
         self.ensure_one()
 
         if self.product_id.type not in ['product']:
-            return True  # No stock movement needed for consumable/service products
+            return True
 
-        # Check stock availability
         self._check_stock_availability()
 
         pharmacy_location = self._get_pharmacy_location()
         customer_location = self._get_customer_location()
 
-        # Create picking (delivery order)
         picking_vals = {
             'picking_type_id': self._get_picking_type().id,
             'partner_id': self.patient_id.partner_id.id if self.patient_id.partner_id else False,
@@ -116,7 +111,6 @@ class HmsPrescriptionLine(models.Model):
         }
         picking = self.env['stock.picking'].create(picking_vals)
 
-        # Create stock move
         move_vals = {
             'name': _('Dispense: %s') % self.product_id.name,
             'product_id': self.product_id.id,
@@ -130,43 +124,32 @@ class HmsPrescriptionLine(models.Model):
         }
         move = self.env['stock.move'].create(move_vals)
 
-        # Confirm the move
         move._action_confirm()
 
-        # Try to assign (reserve) the move
         move._action_assign()
 
-        # Handle the stock move completion
         if move.state == 'assigned':
-            # For newer Odoo versions, we need to handle stock move lines differently
             try:
-                # Try the modern approach first
                 for move_line in move.move_line_ids:
                     if hasattr(move_line, 'quantity'):
                         move_line.quantity = self.qty_dispensed
                     elif hasattr(move_line, 'qty_done'):
                         move_line.qty_done = self.qty_dispensed
                     else:
-                        # Fallback: update the reserved quantity
                         move_line.write({'quantity_done': self.qty_dispensed})
 
-                # Complete the move
                 move._action_done()
 
             except Exception as e:
-                # Alternative approach: Set quantity directly on the move
                 try:
                     move.with_context(skip_reserved_quantity_check=True).write({
                         'quantity_done': self.qty_dispensed
                     })
                     move._action_done()
                 except:
-                    # Final fallback: Force the move completion
                     move.write({'state': 'done', 'quantity_done': self.qty_dispensed})
         else:
-            # If assignment failed, try to force it
             try:
-                # Create move lines manually if needed
                 if not move.move_line_ids:
                     move_line_vals = {
                         'move_id': move.id,
@@ -177,7 +160,6 @@ class HmsPrescriptionLine(models.Model):
                         'picking_id': picking.id,
                     }
 
-                    # Try different field names for quantity
                     if hasattr(self.env['stock.move.line'], 'quantity'):
                         move_line_vals['quantity'] = self.qty_dispensed
                     elif hasattr(self.env['stock.move.line'], 'qty_done'):
@@ -191,7 +173,6 @@ class HmsPrescriptionLine(models.Model):
             except Exception as e:
                 raise UserError(_("Could not complete stock movement: %s") % str(e))
 
-        # Link the move and picking to this prescription line
         self.stock_move_id = move.id
         self.picking_id = picking.id
 
@@ -199,7 +180,6 @@ class HmsPrescriptionLine(models.Model):
 
     def _get_picking_type(self):
         """Get the picking type for pharmacy dispensing"""
-        # Look for a specific pharmacy picking type first
         picking_type = self.env['stock.picking.type'].search([
             ('code', '=', 'outgoing'),
             '|',
@@ -208,7 +188,6 @@ class HmsPrescriptionLine(models.Model):
         ], limit=1)
 
         if not picking_type:
-            # Fallback to default outgoing picking type
             picking_type = self.env['stock.picking.type'].search([
                 ('code', '=', 'outgoing')
             ], limit=1)
@@ -231,15 +210,12 @@ class HmsPrescriptionLine(models.Model):
                                                                                             record.qty_prescribed))
 
             try:
-                # Create stock movement first
                 record._create_stock_movement()
 
-                # Update status and metadata
                 record.state = 'dispensed'
                 record.dispensed_by_id = self.env.user.id
                 record.dispense_date = fields.Datetime.now()
 
-                # Create or update invoice
                 record._create_or_update_invoice()
 
                 record.message_post(body=_("Medication %s has been dispensed. Quantity: %s. Stock updated.") %
@@ -265,7 +241,6 @@ class HmsPrescriptionLine(models.Model):
 
             original_state = record.state
 
-            # Handle stock move reversal if exists
             if record.stock_move_id and record.stock_move_id.state == 'done':
                 record._create_return_stock_movement()
 
@@ -298,7 +273,6 @@ class HmsPrescriptionLine(models.Model):
         pharmacy_location = self._get_pharmacy_location()
         customer_location = self._get_customer_location()
 
-        # Create return picking
         return_picking_vals = {
             'picking_type_id': self._get_return_picking_type().id,
             'partner_id': self.patient_id.partner_id.id if self.patient_id.partner_id else False,
@@ -309,7 +283,6 @@ class HmsPrescriptionLine(models.Model):
         }
         return_picking = self.env['stock.picking'].create(return_picking_vals)
 
-        # Create return stock move
         return_move_vals = {
             'name': _('Return: %s') % self.product_id.name,
             'product_id': self.product_id.id,
@@ -323,11 +296,9 @@ class HmsPrescriptionLine(models.Model):
         }
         return_move = self.env['stock.move'].create(return_move_vals)
 
-        # Confirm and process the return move
         return_move._action_confirm()
         return_move._action_assign()
 
-        # Handle completion similar to the dispense method
         try:
             for move_line in return_move.move_line_ids:
                 if hasattr(move_line, 'quantity'):
@@ -339,7 +310,6 @@ class HmsPrescriptionLine(models.Model):
 
             return_move._action_done()
         except:
-            # Fallback approach
             return_move.write({'state': 'done', 'quantity_done': self.qty_dispensed})
 
         return True
@@ -374,7 +344,7 @@ class HmsPrescriptionLine(models.Model):
             record.state = 'pending'
             record.dispensed_by_id = False
             record.dispense_date = False
-            record.qty_dispensed = 0  # Reset dispensed quantity
+            record.qty_dispensed = 0
             record.stock_move_id = False
             record.picking_id = False
             record.message_post(body=_("Prescription status reset to pending. Stock movements reversed."))
@@ -403,7 +373,6 @@ class HmsPrescriptionLine(models.Model):
             raise UserError(_("No product defined for this prescription line."))
 
         AccountMove = self.env['account.move']
-        # Check for an existing draft invoice for the patient
         existing_invoice = AccountMove.search([
             ('partner_id', '=', self.patient_id.partner_id.id),
             ('state', '=', 'draft'),

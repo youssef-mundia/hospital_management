@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!-- Patient Insurance Tree View -->
     <record id="view_hms_patient_insurance_tree" model="ir.ui.view">
         <field name="name">hms.patient.insurance.tree</field>
         <field name="model">hms.patient.insurance</field>
@@ -16,7 +15,6 @@
         </field>
     </record>
 
-    <!-- Patient Insurance Form View -->
     <record id="view_hms_patient_insurance_form" model="ir.ui.view">
         <field name="name">hms.patient.insurance.form</field>
         <field name="model">hms.patient.insurance</field>
@@ -43,22 +41,4 @@
             </form>
         </field>
     </record>
-
-    <!-- Optionnel: Action pour accéder directement aux assurances si nécessaire -->
-    <!--
-    <record id="action_hms_patient_insurance" model="ir.actions.act_window">
-        <field name="name">Patient Insurances</field>
-        <field name="res_model">hms.patient.insurance</field>
-        <field name="view_mode">tree,form</field>
-    </record>
-    -->
-
-    <!-- Optionnel: Menu item si une action est définie et que vous voulez un accès direct -->
-    <!--
-    <menuitem id="menu_hms_patient_insurance"
-              name="Patient Insurances"
-              parent="menu_hms_patient" // ou menu_hms_config
-              action="action_hms_patient_insurance"
-              sequence="20"/>
-    -->
 </odoo>

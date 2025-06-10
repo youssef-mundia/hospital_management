@@ -1,10 +1,8 @@
 <odoo>
-    <!-- Menu racine pour HMS -->
     <menuitem id="menu_hms_root"
               name="Hôpital"
               sequence="10"/>
 
-    <!-- Sous-menus principaux -->
     <menuitem id="menu_hms_operations"
               name="Opérations"
               parent="menu_hms_root"
@@ -61,7 +59,6 @@
               action="action_hms_department"
               sequence="10"/>
 
-    <!-- Nouvel élément de menu pour la pharmacie -->
     <menuitem id="menu_hms_prescription_dispensing"
               name="Distribution des Ordonnances"
               parent="menu_hms_pharmacy"

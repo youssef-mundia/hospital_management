@@ -22,13 +22,11 @@
         'views/hms_department_views.xml',
         'views/hms_patient_insurance_views.xml',
         'views/product_template_views.xml',
-        'views/hms_pharmacy_views.xml', # Nouveau fichier de vue
+        'views/hms_pharmacy_views.xml',
         'views/hms_menus.xml',
         'demo/hms_demo.xml',
     ],
     'demo': [
-        # Les données de démo sont déjà listées dans 'data' si vous les chargez toujours.
-        # Sinon, déplacez 'demo/hms_demo.xml' ici.
     ],
     'installable': True,
     'application': True,

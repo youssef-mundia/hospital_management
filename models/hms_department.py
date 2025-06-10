@@ -11,8 +11,6 @@ class HmsDepartment(models.Model):
     description = fields.Text(string='Description')
     head_doctor_id = fields.Many2one('hms.doctor', string='Head of Department')
     
-    # Relations
     doctor_ids = fields.One2many('hms.doctor', 'department_id', string='Doctors')
     
-    # Status
     active = fields.Boolean(string='Active', default=True)

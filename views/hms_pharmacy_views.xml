@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!-- Tree View for Prescription Lines (Pharmacy) -->
     <record id="view_hms_prescription_line_pharmacy_tree" model="ir.ui.view">
         <field name="name">hms.prescription.line.pharmacy.tree</field>
         <field name="model">hms.prescription.line</field>
@@ -32,7 +31,6 @@
         </field>
     </record>
 
-    <!-- Form View for Prescription Lines (Pharmacy) -->
     <record id="view_hms_prescription_line_pharmacy_form" model="ir.ui.view">
         <field name="name">hms.prescription.line.pharmacy.form</field>
         <field name="model">hms.prescription.line</field>
@@ -112,7 +110,6 @@
         </field>
     </record>
 
-    <!-- Search View for Prescription Lines (Pharmacy) -->
     <record id="view_hms_prescription_line_pharmacy_search" model="ir.ui.view">
         <field name="name">hms.prescription.line.pharmacy.search</field>
         <field name="model">hms.prescription.line</field>
@@ -145,7 +142,6 @@
         </field>
     </record>
 
-    <!-- Action for Prescription Dispensing -->
     <record id="action_hms_prescription_line_pharmacy" model="ir.actions.act_window">
         <field name="name">Prescription Dispensing</field>
         <field name="res_model">hms.prescription.line</field>

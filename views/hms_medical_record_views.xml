@@ -1,5 +1,4 @@
 <odoo>
-    <!-- Medical Record Form View -->
     <record id="view_hms_medical_record_form" model="ir.ui.view">
         <field name="name">hms.medical.record.form</field>
         <field name="model">hms.medical.record</field>
@@ -87,7 +86,6 @@
         </field>
     </record>
 
-    <!-- Medical Record Tree View -->
     <record id="view_hms_medical_record_tree" model="ir.ui.view">
         <field name="name">hms.medical.record.tree</field>
         <field name="model">hms.medical.record</field>
@@ -103,7 +101,6 @@
         </field>
     </record>
 
-    <!-- Medical Record Search View -->
     <record id="view_hms_medical_record_search" model="ir.ui.view">
         <field name="name">hms.medical.record.search</field>
         <field name="model">hms.medical.record</field>
@@ -125,7 +122,6 @@
         </field>
     </record>
 
-    <!-- Medical Record Action -->
     <record id="action_hms_medical_record" model="ir.actions.act_window">
         <field name="name">Medical Records</field>
         <field name="res_model">hms.medical.record</field>
